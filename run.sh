@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMG_NAME=acd-hw
+IMG_NAME=oh-my-c
 USERNAME=$(id -un)
 script_dir=$(realpath $(dirname $0))
 
