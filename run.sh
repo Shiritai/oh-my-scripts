@@ -14,11 +14,12 @@ sudo docker build -t $IMG_NAME \
                   --build-arg USERNAME="${USERNAME}" \
                   .
 
+# remove generated zip file
+rm scripts.zip
+
 sudo docker run -d -it \
                 -v ./data:/home/${USERNAME}/data \
+                --name ${IMG_NAME} \
                 ${IMG_NAME} bash
-
-# remove ghenerated zip file
-rm scripts.zip
 
 cd $OLD_DIR
