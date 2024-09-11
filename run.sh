@@ -2,7 +2,7 @@
 
 # customizable variables
 IMG_NAME=oh-my-c
-USE_VNC=yes # yes or no
+USE_VNC=no # yes or no
 
 # stack 1: ensure that we're running the script in correct directory
 SCRIPT_DIR=$(realpath $(dirname $0))
@@ -13,7 +13,7 @@ cd $SCRIPT_DIR
 zip -r scripts.zip scripts
 
 # stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
-cat docker-proto-ignore .gitignore >> .dockerignore
+cat proto.dockerignore .gitignore >> .dockerignore
 
 # build docker image
 sudo docker build -t $IMG_NAME \
