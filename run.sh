@@ -29,7 +29,7 @@ rm scripts.zip
 sudo docker run -d -it \
                 -v ./data:/home/${USERNAME}/data \
                 --name ${IMG_NAME} \
-                ${IMG_NAME} bash
+                ${IMG_NAME} ~/scripts/start.sh
 
 # stack 1: go back to old working directory
 cd $OLD_DIR
