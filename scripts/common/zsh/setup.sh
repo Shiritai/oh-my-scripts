@@ -1,13 +1,13 @@
 #!/bin/bash
 
-script_dir=$(realpath $(dirname $0))
+SCRIPT_DIR=$(realpath $(dirname $0))
 
 # Debian series
-install_cmd="sudo apt install -y"
-update_cmd="sudo apt update -y"
+INSTALL_CMD="sudo apt install -y"
+UPDATE_CMD="sudo apt update -y"
 # Arch series
-# install_cmd="sudo pacman -S --noconfirm"
-# update_cmd="sudo pacman -Syu --noconfirm"
+# INSTALL_CMD="sudo pacman -S --noconfirm"
+# UPDATE_CMD="sudo pacman -Syu --noconfirm"
 
 print_info() {
     echo -e "[\e[1;34mINFO\e[0m] $1"
@@ -17,24 +17,24 @@ check_and_install() {
     if ! command -v $1 > /dev/null
     then
         print_info "$1 DNE, installing them..."
-        $install_cmd -y $1
+        $INSTALL_CMD -y $1
     fi
 }
 
 # install packages I prefer :)
 check_or_install_pkg() {
-    $update_cmd
-    prefer_pkg="vim unzip"
-    for item in ${prefer_pkg}; do
+    $UPDATE_CMD
+    PREFER_PKG="vim unzip"
+    for item in ${PREFER_PKG}; do
         check_and_install "${item}"
     done
 }
 
 # setup oh-my-zsh and its dependencies
 check_or_install_omz() {
-    needed_pkg="zsh git curl"
+    NEEDED_PKG="zsh git curl"
     # install zsh and needed commands
-    for item in ${needed_pkg}; do
+    for item in ${NEEDED_PKG}; do
         check_and_install "${item}"
     done
 
@@ -56,7 +56,7 @@ check_or_install_omz() {
         git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
         # setup zsh script, notice that zshrc is set by oh-my-zsh
         # we should override .zshrc even if it exists
-        cp $script_dir/.zshrc ~
+        cp $SCRIPT_DIR/.zshrc ~
     fi
 }
 
@@ -66,14 +66,14 @@ check_or_setup_scripts() {
     if [ ! -f ~/.p10k.zsh ]
     then
         print_info "$USER haven't use p10k yet, setting up p10k..."
-        cp $script_dir/.p10k.zsh ~
+        cp $SCRIPT_DIR/.p10k.zsh ~
     fi
 
     # setup zsh script
     if [ ! -f ~/.zshrc ]
     then
         print_info "$USER haven't use zsh yet, setting up zsh..."
-        cp $script_dir/.zshrc ~
+        cp $SCRIPT_DIR/.zshrc ~
     fi
 }
 
