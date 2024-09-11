@@ -4,7 +4,10 @@ ARG USER="user"
 ENV USER "${USER}"
 
 ARG TZ="Asia/Taipei"
-ENV USER "${USERNAME}"
+
+ARG USE_VNC=no
+ENV USE_VNC "${USE_VNC}"
+
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE DontWarn
 
 # Avoid warnings by switching to noninteractive for the build process

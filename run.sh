@@ -1,10 +1,11 @@
 #!/bin/bash
 
+# customizable variables
 IMG_NAME=oh-my-c
-USERNAME=$(id -un)
-SCRIPT_DIR=$(realpath $(dirname $0))
+USE_VNC=yes # yes or no
 
 # stack 1: ensure that we're running the script in correct directory
+SCRIPT_DIR=$(realpath $(dirname $0))
 OLD_DIR=$pwd
 cd $SCRIPT_DIR
 
@@ -16,7 +17,8 @@ cat docker-proto-ignore .gitignore >> .dockerignore
 
 # build docker image
 sudo docker build -t $IMG_NAME \
-                  --build-arg USERNAME="${USERNAME}" \
+                  --build-arg USER="${USER}" \
+                  --build-arg USE_VNC="${USE_VNC}" \
                   .
 
 # stack 3: remove temporary .dockerignore
@@ -27,7 +29,8 @@ rm scripts.zip
 
 # run container
 sudo docker run -d -it \
-                -v ./data:/home/${USERNAME}/data \
+                -v ./data:/home/${USER}/data \
+                $([[ $USE_VNC = "yes" ]] && echo "-p 5901:5901") \
                 --name ${IMG_NAME} \
                 ${IMG_NAME} ~/scripts/start.sh
 
