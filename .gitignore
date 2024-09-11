@@ -1,2 +1,6 @@
+# ignore things in custom directory
 scripts/custom/*
+!scripts/custom/README.md
+
+# volume mounted in container
 data
