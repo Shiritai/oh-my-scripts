@@ -2,24 +2,10 @@
 
 SCRIPT_DIR=$(realpath $(dirname $0))
 
-# Debian series
 INSTALL_CMD="sudo apt install -y"
 UPDATE_CMD="sudo apt update -y"
-# Arch series
-# INSTALL_CMD="sudo pacman -S --noconfirm"
-# UPDATE_CMD="sudo pacman -Syu --noconfirm"
 
-print_info() {
-    echo -e "[\e[1;34mINFO\e[0m] $1"
-}
-
-check_and_install() {
-    if ! command -v $1 > /dev/null
-    then
-        print_info "$1 DNE, installing them..."
-        $INSTALL_CMD -y $1
-    fi
-}
+source $SCRIPT_DIR/../../utils.sh
 
 # install packages I prefer :)
 check_or_install_pkg() {
