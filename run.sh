@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # customizable variables
-IMG_NAME=oh-my-c
-USE_VNC=no # yes or no
+IMG_NAME=${IMG_NAME:-oh-my-c}
+USE_VNC=${USE_VNC:-no} # yes or no
 
 # stack 1: ensure that we're running the script in correct directory
 SCRIPT_DIR=$(realpath $(dirname $0))
