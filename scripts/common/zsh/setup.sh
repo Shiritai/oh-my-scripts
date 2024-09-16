@@ -2,8 +2,8 @@
 
 SCRIPT_DIR=$(realpath $(dirname $0))
 
-INSTALL_CMD="sudo apt install -y"
-UPDATE_CMD="sudo apt update -y"
+INSTALL_CMD="brew install"
+UPDATE_CMD="true"
 
 source $SCRIPT_DIR/../../utils.sh
 
@@ -32,18 +32,24 @@ check_or_install_omz() {
     fi
 
     # setup oh-my-zsh environment and plugins
-    if [ ! -d ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins ]
+    _ZSH_CUSTOM=${ZSH:-~/.oh-my-zsh}/custom
+    if [ ! -d ${_ZSH_CUSTOM}/plugins ]
     then
         print_info "Omz directory DNE, installing oh-my-zsh and corresponding plugins"
         yes | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-        git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions
-        git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-        # setup zsh script, notice that zshrc is set by oh-my-zsh
-        # we should override .zshrc even if it exists
-        cp $SCRIPT_DIR/.zshrc ~
     fi
+
+    # check existence of all themes and plugins, download if DNE
+    tars=( "${_ZSH_CUSTOM}/plugins/zsh-completions" "${_ZSH_CUSTOM}/plugins/zsh-autosuggestions" "${_ZSH_CUSTOM}/plugins/zsh-syntax-highlighting" "${_ZSH_CUSTOM}/themes/powerlevel10k" )
+    links=( zsh-users/zsh-completions zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting romkatv/powerlevel10k )
+    for i in "${!tars[@]}"; do
+        print_info "Checking ${tars[$i]}..."
+        if [ ! -d ${tars[$i]} ] ; then git clone https://github.com/${links[$i]} ${tars[$i]} ; fi
+    done
+    
+    # setup zsh script, notice that zshrc is set by oh-my-zsh
+    # we should override .zshrc even if it exists
+    cp $SCRIPT_DIR/.zshrc ~
 }
 
 # setup zsh scripts
