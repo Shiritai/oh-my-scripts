@@ -2,27 +2,32 @@
 
 # Script dependencies: `zip` and `docker`
 
-# customizable variables
+# Directory of this script, a.k.a. `oh-my-scripts`
+SCRIPT_DIR=$(realpath $(dirname $0))
+
+# Customizable variables
 IMG_NAME=${IMG_NAME:-oh-my-c}
 USE_VNC=${USE_VNC:-no} # yes or no
 VNC_PORT=${VNC_PORT:-5901}
 
+DEFAULT_CUSTOM_SCRIPTS_PATH=$SCRIPT_DIR/custom
 # Path of custom scripts is also customizable.
 # Your own custom scripts will be copied to `custom`
 # directory of this repo everytime you run this script.
-DEFAULT_CUSTOM_SCRIPTS_PATH=custom
-CUSTOM_SCRIPTS_PATH=${CUSTOM_SCRIPTS_PATH:-$DEFAULT_CUSTOM_SCRIPTS_PATH}
+CUSTOM_SCRIPTS_PATH=$(realpath ${CUSTOM_SCRIPTS_PATH:-$DEFAULT_CUSTOM_SCRIPTS_PATH})
 
 # Project path is customizable
 USE_MOUNT_DIR=${USE_MOUNT_DIR:-no} # yes or no, no means do not mount volume
-MOUNT_DIR=${MOUNT_DIR:-"./data"}
+MOUNT_DIR=$(realpath ${MOUNT_DIR:-"$SCRIPT_DIR/data"})
 
 # stack 1: ensure that we're running the script in correct directory
-SCRIPT_DIR=$(realpath $(dirname $0))
 OLD_DIR=$pwd
 cd $SCRIPT_DIR
 
 # stack 1.5: copy custom scripts if the path is assigned
+# Note: the copied custom scripts will not be removed automatically
+# since we can't make sure which file/directory in custom is
+# placed by the user or copied by this scripts
 if [[ $CUSTOM_SCRIPTS_PATH != $DEFAULT_CUSTOM_SCRIPTS_PATH ]] ; then
     cp -r ${CUSTOM_SCRIPTS_PATH}/* $SCRIPT_DIR/scripts/custom
 fi
@@ -44,11 +49,6 @@ rm .dockerignore
 
 # stack 2: remove generated zip file
 rm scripts.zip
-
-# stack 1.5: remove copied custom scripts if the custom path is assigned
-if [[ $CUSTOM_SCRIPTS_PATH != $DEFAULT_CUSTOM_SCRIPTS_PATH ]] ; then
-    rm -rf $SCRIPT_DIR/scripts/custom/*
-fi
 
 # run container
 sudo docker run -d -it \
