@@ -2,8 +2,8 @@
 
 SCRIPT_DIR=$(realpath $(dirname $0))
 
-INSTALL_CMD="brew install"
-UPDATE_CMD="true"
+INSTALL_CMD="sudo apt install -y"
+UPDATE_CMD="sudo apt update -y"
 
 source $SCRIPT_DIR/../../utils.sh
 
