@@ -45,17 +45,17 @@ rm .dockerignore
 # stack 2: remove generated zip file
 rm scripts.zip
 
+# stack 1.5: remove copied custom scripts if the custom path is assigned
+if [[ $CUSTOM_SCRIPTS_PATH != $DEFAULT_CUSTOM_SCRIPTS_PATH ]] ; then
+    rm -rf $SCRIPT_DIR/scripts/custom/*
+fi
+
 # run container
 sudo docker run -d -it \
                 $([[ $USE_MOUNT_DIR = "yes" ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
                 $([[ $USE_VNC = "yes" ]] && echo "-p $VNC_PORT:5901") \
                 --name ${IMG_NAME} \
                 ${IMG_NAME} /home/${USER}/scripts/start.sh
-
-# stack 1.5: remove copied custom scripts if the custom path is assigned
-if [[ $CUSTOM_SCRIPTS_PATH != $DEFAULT_CUSTOM_SCRIPTS_PATH ]] ; then
-    rm -rf $SCRIPT_DIR/scripts/custom/*
-fi
 
 # stack 1: go back to old working directory
 cd $OLD_DIR
