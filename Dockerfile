@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM --platform=linux/amd64 ubuntu:24.04
 
 ARG USER="user"
 ENV USER "${USER}"
