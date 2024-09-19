@@ -9,7 +9,7 @@ echo 'Updating /etc/hosts file...'
 echo "127.0.1.1\t$HOSTNAME" | sudo tee /etc/hosts
 
 echo "Starting VNC server at $RESOLUTION..."
-vncserver -kill :1 || true
+vncserver -kill :1
 vncserver -geometry $RESOLUTION &
 
 echo "VNC server started at $RESOLUTION! ^-^"
