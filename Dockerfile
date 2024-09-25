@@ -31,21 +31,29 @@ RUN sudo chown -R ${USER} /home/${USER}/scripts && \
     sudo unzip /home/${USER}/scripts-utils.zip -d /home/${USER} && \
     rm /home/${USER}/scripts-utils.zip
 
+# Install common plugins
 COPY scripts-common.zip /home/${USER}
 RUN sudo unzip /home/${USER}/scripts-common.zip -d /home/${USER} && \
     rm /home/${USER}/scripts-common.zip
-    
 # source all utils and run setup scripts in common
 RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
     install_all_plugins_in /home/${USER}/scripts/common
 
+# Install custom plugins
 COPY scripts-custom.zip /home/${USER}
 RUN sudo unzip /home/${USER}/scripts-custom.zip -d /home/${USER} && \
     rm /home/${USER}/scripts-custom.zip
-
 # source all utils and run setup scripts in custom
 RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
     install_all_plugins_in /home/${USER}/scripts/custom
+
+# Install dev plugins
+COPY scripts-dev.zip /home/${USER}
+RUN sudo unzip /home/${USER}/scripts-dev.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-dev.zip
+# source all utils and run setup scripts in dev
+RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
+    install_all_plugins_in /home/${USER}/scripts/dev
 
 WORKDIR /home/${USER}
 

@@ -56,8 +56,10 @@ fi
 if ! [[ -f scripts-utils.zip ]]; then zip -r scripts-utils.zip scripts/utils; fi
 # zip common scripts once, since files here seldom changes
 if ! [[ -f scripts-common.zip ]]; then zip -r scripts-common.zip scripts/common; fi
-# re-zip custom scripts everytime
-zip -r scripts-custom.zip scripts/custom
+# zip custom scripts once, since files here seldom changes
+if ! [[ -f scripts-custom.zip ]]; then zip -r scripts-custom.zip scripts/custom; fi
+# re-zip dev (custom) scripts everytime
+zip -r scripts-dev.zip scripts/dev
 
 # stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
 cat proto.dockerignore .gitignore >> .dockerignore
@@ -74,7 +76,7 @@ sudo docker build -t $IMG_NAME \
 rm .dockerignore
 
 # stack 2: remove generated zip file
-rm scripts-custom.zip
+rm scripts-dev.zip
 
 # run container
 sudo docker run -d -it \
