@@ -1,7 +1,8 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(realpath $(dirname $0))
-source $SCRIPT_DIR/../../utils/*.sh
+# source all utils scripts
+for item in $SCRIPT_DIR/../../utils/*.sh; do . $item; done
 
 # only install vnc dependency if using vnc
 if ! [ $USE_VNC = "yes" ]; then

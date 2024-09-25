@@ -1,7 +1,8 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(realpath $(dirname $0))
-source $SCRIPT_DIR/../../utils/*.sh
+# source all utils scripts
+for item in $SCRIPT_DIR/../../utils/*.sh; do . $item; done
 
 INSTALL_CMD="sudo apt install -y"
 UPDATE_CMD="sudo apt update -y"
