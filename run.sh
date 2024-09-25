@@ -6,6 +6,7 @@
 SCRIPT_DIR=$(realpath $(dirname $0))
 
 # Customizable variables
+BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
 IMG_NAME=${IMG_NAME:-oh-my-c}
 USE_VNC=${USE_VNC:-no} # yes or no
 VNC_PORT=${VNC_PORT:-5901}
@@ -64,6 +65,7 @@ cat proto.dockerignore .gitignore >> .dockerignore
 # build docker image
 sudo docker build -t $IMG_NAME \
                   --platform linux/amd64 \
+                  --build-arg BASE_IMG="${BASE_IMG}" \
                   --build-arg USER="${USER}" \
                   --build-arg USE_VNC="${USE_VNC}" \
                   .

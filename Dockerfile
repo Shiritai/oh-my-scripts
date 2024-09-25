@@ -1,4 +1,5 @@
-FROM --platform=linux/amd64 ubuntu:20.04
+ARG BASE_IMG="ubuntu:20.04"
+FROM ${BASE_IMG}
 
 ARG USER="user"
 ENV USER "${USER}"
