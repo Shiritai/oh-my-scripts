@@ -80,6 +80,7 @@ rm scripts-custom.zip
 sudo docker run -d -it \
                 $([[ $USE_MOUNT_DIR = "yes" ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
                 $([[ $USE_VNC = "yes" ]] && echo "-p $VNC_PORT:5901") \
+                --gpus all \
                 --name ${IMG_NAME} \
                 ${IMG_NAME} bash
                 # ${IMG_NAME} /home/${USER}/scripts/start.sh
