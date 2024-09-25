@@ -21,14 +21,22 @@ RUN echo ${USER} && \
     echo "${USER} ALL = NOPASSWD: ALL" > /etc/sudoers.d/"${USER}" && \
     chmod 0440 /etc/sudoers.d/"${USER}" && \
     passwd -d "${USER}" && \
-    mkdir /home/${USER}/data
+    mkdir /home/${USER}/scripts
 
 USER "${USER}"
 
-COPY scripts.zip /home/${USER}
-RUN sudo unzip /home/${USER}/scripts.zip -d /home/${USER}
-RUN /home/${USER}/scripts/setup.sh && \
-    rm /home/${USER}/scripts.zip
+COPY scripts-utils.zip /home/${USER}
+RUN sudo chown -R ${USER} /home/${USER}/scripts && \
+    sudo unzip /home/${USER}/scripts-utils.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-utils.zip
+
+COPY scripts-common.zip /home/${USER}
+RUN sudo unzip /home/${USER}/scripts-common.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-common.zip
+
+# source all utils and run setup scripts
+RUN . /home/${USER}/scripts/utils/install_all_plugins_in.s && \
+    install_all_plugins_in /home/${USER}/scripts/common
 
 WORKDIR /home/${USER}
 

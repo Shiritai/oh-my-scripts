@@ -51,7 +51,12 @@ if [[ $CUSTOM_SCRIPTS_PATH != $DEFAULT_CUSTOM_SCRIPTS_PATH ]] ; then
 fi
 
 # stack 2: zip scripts to a single file for image building
-zip -r scripts.zip scripts
+# zip util scripts once, since files here seldom changes
+if ! [[ -f scripts-utils.zip ]]; then zip -r scripts-utils.zip scripts/utils; fi
+# zip common scripts once, since files here seldom changes
+if ! [[ -f scripts-common.zip ]]; then zip -r scripts-common.zip scripts/common; fi
+# re-zip custom scripts everytime
+zip -r scripts-custom.zip scripts/custom
 
 # stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
 cat proto.dockerignore .gitignore >> .dockerignore
@@ -67,14 +72,15 @@ sudo docker build -t $IMG_NAME \
 rm .dockerignore
 
 # stack 2: remove generated zip file
-rm scripts.zip
+rm scripts-custom.zip
 
 # run container
 sudo docker run -d -it \
                 $([[ $USE_MOUNT_DIR = "yes" ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
                 $([[ $USE_VNC = "yes" ]] && echo "-p $VNC_PORT:5901") \
                 --name ${IMG_NAME} \
-                ${IMG_NAME} /home/${USER}/scripts/start.sh
+                ${IMG_NAME} bash
+                # ${IMG_NAME} /home/${USER}/scripts/start.sh
 
 # stack 1: go back to old working directory
 cd $OLD_DIR

@@ -1,12 +1,10 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(realpath $(dirname $0))
-source $SCRIPT_DIR/../../utils.sh
-
-echo $USE_VNC
+source $SCRIPT_DIR/../../utils/*.sh
 
 # only install vnc dependency if using vnc
-if [[ $USE_VNC = "no" ]]; then
+if ! [ $USE_VNC = "yes" ]; then
     print_info "No VNC service needed"
     exit 0
 fi
