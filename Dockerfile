@@ -34,10 +34,18 @@ RUN sudo chown -R ${USER} /home/${USER}/scripts && \
 COPY scripts-common.zip /home/${USER}
 RUN sudo unzip /home/${USER}/scripts-common.zip -d /home/${USER} && \
     rm /home/${USER}/scripts-common.zip
-
-# source all utils and run setup scripts
+    
+# source all utils and run setup scripts in common
 RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
     install_all_plugins_in /home/${USER}/scripts/common
+
+COPY scripts-custom.zip /home/${USER}
+RUN sudo unzip /home/${USER}/scripts-custom.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-custom.zip
+
+# source all utils and run setup scripts in custom
+RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
+    install_all_plugins_in /home/${USER}/scripts/custom
 
 WORKDIR /home/${USER}
 
