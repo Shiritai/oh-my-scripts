@@ -36,7 +36,7 @@ RUN sudo unzip /home/${USER}/scripts-common.zip -d /home/${USER} && \
     rm /home/${USER}/scripts-common.zip
 
 # source all utils and run setup scripts
-RUN . /home/${USER}/scripts/utils/install_all_plugins_in.s && \
+RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
     install_all_plugins_in /home/${USER}/scripts/common
 
 WORKDIR /home/${USER}
