@@ -18,12 +18,7 @@ VNC_PASSWORD=vncpswd
 
 sudo apt update -y
 
-sudo apt install -y --no-install-recommends \
-    xfce4 \
-    xfce4-goodies \
-    tightvncserver \
-    dbus-x11 \
-    xfonts-base
+sudo apt install -y tightvncserver
 
 mkdir $HOME/.vnc
 
