@@ -18,7 +18,7 @@ check_or_install_pkg() {
 
 # setup oh-my-zsh and its dependencies
 check_or_install_omz() {
-    NEEDED_PKG="zsh git curl"
+    NEEDED_PKG="zsh git curl wget"
     # install zsh and needed commands
     for item in ${NEEDED_PKG}; do
         check_and_install "${item}"
