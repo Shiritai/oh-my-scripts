@@ -50,6 +50,13 @@ check_or_install_omz() {
     # setup zsh script, notice that zshrc is set by oh-my-zsh
     # we should override .zshrc even if it exists
     cp $SCRIPT_DIR/.zshrc ~
+
+    # download and install meslo nerd font
+    links=( MesloLGS%20NF%20Regular.ttf MesloLGS%20NF%20Bold.ttf MesloLGS%20NF%20Italic.ttf MesloLGS%20NF%20Bold%20Italic.ttf )
+    for i in "${!links[@]}"; do
+        sudo wget -P /usr/local/share/fonts "https://github.com/romkatv/powerlevel10k-media/raw/master/${links[$i]}"
+    done
+    fc-cache -fv
 }
 
 # setup zsh scripts
