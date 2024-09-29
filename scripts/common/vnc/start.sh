@@ -1,9 +1,5 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(realpath $(dirname $0))
-# source all utils scripts
-for item in $SCRIPT_DIR/../../utils/*.sh; do . $item; done
-
 [[ $USE_VNC = "no" ]] && exit 0
 
 RESOLUTION=1920x1080

@@ -100,7 +100,7 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_GPU = "yes" ]] && echo "--runtime=nvidia --gpus all") \
                     --privileged \
                     --name ${IMG_NAME} \
-                    ${IMG_NAME} bash
+                    ${IMG_NAME} "/home/${USER}/scripts/run-with-utils.sh start_all_plugins_in /home/${USER}/scripts"
                     # ${IMG_NAME} /home/${USER}/scripts/start.sh
 fi
 

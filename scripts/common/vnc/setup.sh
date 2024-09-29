@@ -1,9 +1,5 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(realpath $(dirname $0))
-# source all utils scripts
-for item in $SCRIPT_DIR/../../utils/*.sh; do . $item; done
-
 # only install vnc dependency if using vnc
 if ! [ $USE_VNC = "yes" ]; then
     print_info "No VNC service needed"
@@ -16,9 +12,7 @@ print_info "VNC service is needed, preparing xfce and vnc server..."
 #       will be truncated to the length of 8
 VNC_PASSWORD=vncpswd
 
-sudo apt update -y
-
-sudo apt install -y tightvncserver
+install_if_dne tightvncserver
 
 mkdir $HOME/.vnc
 

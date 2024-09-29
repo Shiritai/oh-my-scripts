@@ -1,29 +1,9 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(realpath $(dirname $0))
-# source all utils scripts
-for item in $SCRIPT_DIR/../../utils/*.sh; do . $item; done
-
-INSTALL_CMD="sudo apt install -y"
-UPDATE_CMD="sudo apt update -y"
-
-# install packages I prefer :)
-check_or_install_pkg() {
-    $UPDATE_CMD
-    PREFER_PKG="vim unzip"
-    for item in ${PREFER_PKG}; do
-        check_and_install "${item}"
-    done
-}
 
 # setup oh-my-zsh and its dependencies
 check_or_install_omz() {
-    NEEDED_PKG="zsh git curl wget"
-    # install zsh and needed commands
-    for item in ${NEEDED_PKG}; do
-        check_and_install "${item}"
-    done
-
     # set zsh as default shell
     if ! cat /etc/passwd | grep $USER | grep zsh > /dev/null
     then
@@ -76,7 +56,7 @@ check_or_setup_scripts() {
     fi
 }
 
-check_or_install_pkg
+check_or_install vim unzip zsh git curl wget
 check_or_install_omz
 check_or_setup_scripts
 

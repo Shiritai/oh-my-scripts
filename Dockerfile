@@ -39,6 +39,7 @@ COPY scripts-utils.zip /home/${USER}
 COPY scripts-common.zip /home/${USER}
 COPY scripts-custom.zip /home/${USER}
 COPY scripts-dev.zip /home/${USER}
+COPY scripts/run-with-utils.sh /home/${USER}/scripts
 
 RUN sudo chown -R ${USER} /home/${USER}/scripts && \
     sudo unzip /home/${USER}/scripts-utils.zip -d /home/${USER} && \
@@ -51,16 +52,16 @@ RUN sudo chown -R ${USER} /home/${USER}/scripts && \
     rm /home/${USER}/scripts-dev.zip
 
 # Install common plugins
-RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
-    install_all_plugins_in /home/${USER}/scripts/common
+RUN /home/${USER}/scripts/run-with-utils.sh \
+    setup_all_plugins_in /home/${USER}/scripts/common
 
 # Install custom plugins
-RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
-    install_all_plugins_in /home/${USER}/scripts/custom
+RUN /home/${USER}/scripts/run-with-utils.sh \
+    setup_all_plugins_in /home/${USER}/scripts/custom
 
 # Install dev plugins
-RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
-    install_all_plugins_in /home/${USER}/scripts/dev
+RUN /home/${USER}/scripts/run-with-utils.sh \
+    setup_all_plugins_in /home/${USER}/scripts/dev
 
 WORKDIR /home/${USER}
 
