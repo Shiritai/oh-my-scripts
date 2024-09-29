@@ -34,7 +34,7 @@ cd noVNC
 # Make sure that $SSL_REQ_CONFOG_FILE exists
 SSL_REQ_CONFOG_FILE=$SCRIPT_DIR/openssl-req.conf
 if ! [[ -f $SSL_REQ_CONFOG_FILE ]]; then
-    cp $SSL_REQ_CONFOG_FILE.sample $SSL_REQ_CONFOG_FILE
+    sudo cp $SSL_REQ_CONFOG_FILE.sample $SSL_REQ_CONFOG_FILE
 fi
 
 openssl req -new -x509 -days 365 -nodes -out self.pem -keyout self.pem -config $SSL_REQ_CONFOG_FILE
