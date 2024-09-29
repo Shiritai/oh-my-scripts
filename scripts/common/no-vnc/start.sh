@@ -10,10 +10,12 @@ print_info "127.0.1.1\t$HOSTNAME" | sudo tee /etc/hosts
 
 print_info "Starting VNC server with resolution $RESOLUTION..."
 vncserver -kill :1
+
+# start vnc first
 vncserver -geometry $RESOLUTION :1
+print_info "VNC server started"
 
-print_info "VNC server started ^-^"
+# then start noVNC
+~/noVNC/utils/novnc_proxy --vnc :5901 --listen 6901 &
 
-print_info "Starting xfce4"
-
-DISPLAY=:1 startxfce4 &
+print_info "noVNC started"

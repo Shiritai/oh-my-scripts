@@ -14,8 +14,9 @@ USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
 USE_GPU=${USE_VNC:-no} # yes or no
 
-USE_VNC=${USE_VNC:-no} # yes or no
-VNC_PORT=${VNC_PORT:-5901} # port of host to open as vnc
+VNC_PSWD=${VNC_PSWD:-"vncpswd"}
+USE_NO_VNC=${USE_NO_VNC:-no} # yes or no
+NO_VNC_PORT=${NO_VNC_PORT:-6901} # port of host to open for noVNC
 
 USE_SSH=${USE_SSH:-no} # yes or no
 SSH_PORT=${SSH_PORT:-22} # port of host to open as vnc
