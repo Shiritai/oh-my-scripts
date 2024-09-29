@@ -1,6 +1,8 @@
 #!/bin/bash
 
-rm scripts-*
+SCRIPT_DIR=$(realpath $(dirname $0))
 
-sudo docker rm -f oh-my-c
-sudo docker image remove -f oh-my-c
+rm $SCRIPT_DIR/scripts-*
+
+sudo docker rm -f $1
+sudo docker image remove -f $1
