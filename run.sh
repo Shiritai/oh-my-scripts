@@ -13,8 +13,12 @@ IMG_NAME=${IMG_NAME:-oh-my-c}
 USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
 USE_GPU=${USE_VNC:-yes} # yes or no
+
 USE_VNC=${USE_VNC:-no} # yes or no
 VNC_PORT=${VNC_PORT:-5901} # port of host to open as vnc
+
+USE_SSH=${USE_SSH:-no} # yes or no
+SSH_PORT=${SSH_PORT:-22} # port of host to open as vnc
 
 # oh-my-scripts running mode
 # b: build only
@@ -97,6 +101,7 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
     sudo docker run -d -it \
                     $([[ $USE_MOUNT_DIR = "yes" ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
                     $([[ $USE_VNC = "yes" ]] && echo "-p $VNC_PORT:5901") \
+                    $([[ $USE_SSH = "yes" ]] && echo "-p $SSH_PORT:22") \
                     $([[ $USE_GPU = "yes" ]] && echo "--runtime=nvidia --gpus all") \
                     --privileged \
                     --name ${IMG_NAME} \
