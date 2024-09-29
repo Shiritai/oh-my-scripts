@@ -8,6 +8,10 @@ SCRIPT_DIR=$(realpath $(dirname $0))
 # Customizable variables
 BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
 IMG_NAME=${IMG_NAME:-oh-my-c}
+
+# Feel free to change user password if needed
+USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
+
 USE_GPU=${USE_VNC:-yes} # yes or no
 USE_VNC=${USE_VNC:-no} # yes or no
 VNC_PORT=${VNC_PORT:-5901} # port of host to open as vnc
@@ -77,6 +81,7 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                     --platform linux/amd64 \
                     --build-arg BASE_IMG="${BASE_IMG}" \
                     --build-arg USER="${USER}" \
+                    --build-arg USER_PSWD="${USER_PSWD}" \
                     --build-arg USE_VNC="${USE_VNC}" \
                     .
 fi

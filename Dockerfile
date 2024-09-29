@@ -6,6 +6,9 @@ ENV USER "${USER}"
 
 ARG TZ="Asia/Taipei"
 
+ARG USER_PSWD="CHANGE_ME"
+ENV USER_PSWD "${USER_PSWD}"
+
 ARG USE_VNC=no
 ENV USE_VNC "${USE_VNC}"
 
@@ -62,6 +65,9 @@ RUN . /home/${USER}/scripts/utils/install_all_plugins_in.sh && \
 
 WORKDIR /home/${USER}
 
+# set user password
+RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
+# clean up package cache
 RUN sudo apt clean && \
     sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
