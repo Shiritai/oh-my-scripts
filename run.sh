@@ -12,7 +12,7 @@ IMG_NAME=${IMG_NAME:-oh-my-c}
 # Feel free to change user password if needed
 USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
-USE_GPU=${USE_VNC:-yes} # yes or no
+USE_GPU=${USE_VNC:-no} # yes or no
 
 USE_VNC=${USE_VNC:-no} # yes or no
 VNC_PORT=${VNC_PORT:-5901} # port of host to open as vnc
@@ -105,8 +105,7 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_GPU = "yes" ]] && echo "--runtime=nvidia --gpus all") \
                     --privileged \
                     --name ${IMG_NAME} \
-                    ${IMG_NAME} "/home/${USER}/scripts/run-with-utils.sh start_all_plugins_in /home/${USER}/scripts"
-                    # ${IMG_NAME} /home/${USER}/scripts/start.sh
+                    ${IMG_NAME} 
 fi
 
 # stack 1: go back to old working directory

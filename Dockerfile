@@ -71,4 +71,6 @@ RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
 RUN sudo apt clean && \
     sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-CMD [ "bash" ]
+CMD [ "./scripts/run-with-utils.sh", \
+      "start_all_plugins_in", \
+      "./scripts" ]
