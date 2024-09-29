@@ -103,7 +103,7 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_VNC = "yes" ]] && echo "-p $VNC_PORT:5901") \
                     $([[ $USE_SSH = "yes" ]] && echo "-p $SSH_PORT:22") \
                     $([[ $USE_GPU = "yes" ]] && echo "--runtime=nvidia --gpus all") \
-                    --privileged \
+                    -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
                     ${IMG_NAME} 
 fi
