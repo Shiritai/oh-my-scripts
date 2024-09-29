@@ -23,10 +23,9 @@ ENV NVIDIA_VISIBLE_DEVICES \
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-RUN echo ${USER} && \
-    ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
-    apt update && apt upgrade -y && \
-    apt install sudo unzip -y && \
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
+    apt-get update -qq -y && apt-get upgrade -qq -y && \
+    apt-get install -qq -y sudo unzip && \
     useradd -m -G sudo "${USER}" && \
     echo "${USER} ALL = NOPASSWD: ALL" > /etc/sudoers.d/"${USER}" && \
     chmod 0440 /etc/sudoers.d/"${USER}" && \
