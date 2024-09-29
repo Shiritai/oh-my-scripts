@@ -1,0 +1,7 @@
+[ req ]
+default_keyfile = privkey.pem
+prompt = no
+distinguished_name = req_1
+
+[req_1]
+C = ZZ
