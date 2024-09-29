@@ -12,14 +12,14 @@ IMG_NAME=${IMG_NAME:-oh-my-c}
 # Feel free to change user password if needed
 USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
-USE_GPU=${USE_VNC:-no} # yes or no
+USE_GPU=${USE_GPU:-no} # yes or no
 
 VNC_PSWD=${VNC_PSWD:-"vncpswd"}
 USE_NO_VNC=${USE_NO_VNC:-no} # yes or no
 NO_VNC_PORT=${NO_VNC_PORT:-6901} # port of host to open for noVNC
 
 USE_SSH=${USE_SSH:-no} # yes or no
-SSH_PORT=${SSH_PORT:-22} # port of host to open as vnc
+SSH_PORT=${SSH_PORT:-22} # port of host to open for ssh
 
 # oh-my-scripts running mode
 # b: build only
@@ -87,7 +87,8 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                     --build-arg BASE_IMG="${BASE_IMG}" \
                     --build-arg USER="${USER}" \
                     --build-arg USER_PSWD="${USER_PSWD}" \
-                    --build-arg USE_VNC="${USE_VNC}" \
+                    --build-arg VNC_PSWD="${VNC_PSWD}" \
+                    --build-arg USE_NO_VNC="${USE_NO_VNC}" \
                     .
 fi
 
@@ -101,12 +102,12 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
     # run container
     sudo docker run -d -it \
                     $([[ $USE_MOUNT_DIR = "yes" ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
-                    $([[ $USE_VNC = "yes" ]] && echo "-p $VNC_PORT:5901") \
+                    $([[ $USE_NO_VNC = "yes" ]] && echo "-p $NO_VNC_PORT:6901") \
                     $([[ $USE_SSH = "yes" ]] && echo "-p $SSH_PORT:22") \
                     $([[ $USE_GPU = "yes" ]] && echo "--runtime=nvidia --gpus all") \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
-                    ${IMG_NAME} 
+                    ${IMG_NAME}
 fi
 
 # stack 1: go back to old working directory

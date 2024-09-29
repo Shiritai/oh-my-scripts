@@ -71,7 +71,7 @@ WORKDIR /home/${USER}
 # set user password
 RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
 # clean up package cache
-RUN sudo apt clean && \
+RUN sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD [ "./scripts/run-with-utils.sh", \
