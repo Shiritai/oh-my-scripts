@@ -12,7 +12,7 @@ install_if_dne() {
                 _UPDATED=yes
             fi
             print_info "$item DNE, install it..."
-            sudo apt-get install -qq -y $item > /dev/null
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y $item > /dev/null
             print_info "$item installed successfully"
         fi
     done
