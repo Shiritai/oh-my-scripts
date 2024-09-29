@@ -19,4 +19,5 @@ setup_all_plugins_in() {
 
 start_all_plugins_in() {
     invoke_all_plugins_scripts_in start.sh $1
+    bash
 }
