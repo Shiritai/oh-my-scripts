@@ -56,7 +56,7 @@ check_or_setup_scripts() {
     fi
 }
 
-check_or_install vim unzip zsh git curl wget
+install_if_dne vim unzip zsh git curl wget
 check_or_install_omz
 check_or_setup_scripts
 
