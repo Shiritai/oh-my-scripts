@@ -83,13 +83,13 @@ cat proto.dockerignore .gitignore >> .dockerignore
 if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
     # build docker image
     sudo docker build -t $IMG_NAME \
-                    --platform linux/amd64 \
-                    --build-arg BASE_IMG="${BASE_IMG}" \
-                    --build-arg USER="${USER}" \
-                    --build-arg USER_PSWD="${USER_PSWD}" \
-                    --build-arg VNC_PSWD="${VNC_PSWD}" \
-                    --build-arg USE_NO_VNC="${USE_NO_VNC}" \
-                    .
+                      --platform linux/amd64 \
+                      --build-arg BASE_IMG="${BASE_IMG}" \
+                      --build-arg USER="${USER}" \
+                      --build-arg USER_PSWD="${USER_PSWD}" \
+                      --build-arg VNC_PSWD="${VNC_PSWD}" \
+                      --build-arg USE_NO_VNC="${USE_NO_VNC}" \
+                      . 2>&1 | tee build.log
 fi
 
 # stack 3: remove temporary .dockerignore
