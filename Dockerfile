@@ -39,31 +39,33 @@ USER "${USER}"
 
 # copy scripts to container
 COPY scripts-utils.zip /home/${USER}
-COPY scripts-common.zip /home/${USER}
-COPY scripts-custom.zip /home/${USER}
-COPY scripts-dev.zip /home/${USER}
-COPY scripts/run-with-utils.sh /home/${USER}/scripts
-
 RUN sudo chown -R ${USER} /home/${USER}/scripts && \
     sudo unzip /home/${USER}/scripts-utils.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-utils.zip && \
-    sudo unzip /home/${USER}/scripts-common.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-common.zip && \
-    sudo unzip /home/${USER}/scripts-custom.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-custom.zip && \
-    sudo unzip /home/${USER}/scripts-dev.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-dev.zip
+    rm /home/${USER}/scripts-utils.zip
+COPY scripts/run-with-utils.sh /home/${USER}/scripts
 
 # Install common plugins
-RUN /home/${USER}/scripts/run-with-utils.sh \
+COPY scripts-common.zip /home/${USER}
+RUN sudo chown -R ${USER} /home/${USER}/scripts && \
+    sudo unzip /home/${USER}/scripts-common.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-common.zip && \
+    /home/${USER}/scripts/run-with-utils.sh \
     setup_all_plugins_in /home/${USER}/scripts/common
 
 # Install custom plugins
-RUN /home/${USER}/scripts/run-with-utils.sh \
+COPY scripts-custom.zip /home/${USER}
+RUN sudo chown -R ${USER} /home/${USER}/scripts && \
+    sudo unzip /home/${USER}/scripts-custom.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-custom.zip && \
+    /home/${USER}/scripts/run-with-utils.sh \
     setup_all_plugins_in /home/${USER}/scripts/custom
 
 # Install dev plugins
-RUN /home/${USER}/scripts/run-with-utils.sh \
+COPY scripts-dev.zip /home/${USER}
+RUN sudo chown -R ${USER} /home/${USER}/scripts && \
+    sudo unzip /home/${USER}/scripts-dev.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-dev.zip && \
+    /home/${USER}/scripts/run-with-utils.sh \
     setup_all_plugins_in /home/${USER}/scripts/dev
 
 WORKDIR /home/${USER}
@@ -75,5 +77,5 @@ RUN sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD [ "./scripts/run-with-utils.sh", \
-      "start_all_plugins_in", \
-      "./scripts" ]
+    "start_all_plugins_in", \
+    "./scripts" ]
