@@ -34,9 +34,9 @@ check_or_install_omz() {
     # download and install meslo nerd font
     links=( MesloLGS%20NF%20Regular.ttf MesloLGS%20NF%20Bold.ttf MesloLGS%20NF%20Italic.ttf MesloLGS%20NF%20Bold%20Italic.ttf )
     for i in "${!links[@]}"; do
-        sudo wget -P /usr/local/share/fonts "https://github.com/romkatv/powerlevel10k-media/raw/master/${links[$i]}"
+        sudo wget -P /usr/local/share/fonts "https://github.com/romkatv/powerlevel10k-media/raw/master/${links[$i]}" > /dev/null 2>&1
     done
-    fc-cache -fv
+    fc-cache -fv > /dev/null
 }
 
 # setup zsh scripts
