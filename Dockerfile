@@ -97,7 +97,6 @@ WORKDIR /home/${USER}
 
 # set user password
 RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
-# clean up package cache
 
 # Switch back to root to start systemd
 USER root
