@@ -3,6 +3,11 @@ scripts/custom/*
 scripts/dev/*
 !scripts/custom/README.md
 
+# ignore generated files
+scripts-*.zip
+build.log
+.dockerignore
+
 # volume mounted in container
 data
 

@@ -78,7 +78,7 @@ if ! [[ -f scripts-custom.zip ]]; then zip -r scripts-custom.zip scripts/custom;
 zip -r scripts-dev.zip scripts/dev
 
 # stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
-cat proto.dockerignore .gitignore >> .dockerignore
+cat .gitignore proto.dockerignore >> .dockerignore
 
 if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
     # build docker image

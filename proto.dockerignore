@@ -1,3 +1,7 @@
 .gitignore
 proto.dockerignore
 run.sh
+
+# tag files that should not be ignored by docker build
+!.dockerignore
+!scripts-*.zip
