@@ -24,6 +24,10 @@ sudo openssl req -new \
                  -keyout self.pem \
                  -config $SSL_REQ_CONFOG_FILE
 
+# clone websockify
+cd utils
+sudo git clone https://github.com/novnc/websockify
+
 echo "[Unit]
 Description=noVNC remote desktop server
 After=tigervnc@:1.service
@@ -37,5 +41,12 @@ ExecStart=/usr/share/noVNC/utils/novnc_proxy --vnc :5901 --listen 6901
 WantedBy=multi-user.target" | sudo tee /etc/systemd/system/novnc.service
 
 sudo systemctl enable novnc
+
+print_info "Install numpy for better noVNC performance"
+
+# install pip & install numpy for better
+# noVNC performance, dependent: websockify
+install_if_dne python3-pip
+yes | pip3 install numpy
 
 print_info "noVNC environment is now set"
