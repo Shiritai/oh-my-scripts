@@ -4,7 +4,7 @@ SCRIPT_DIR=$(realpath $(dirname $0))
 
 # only install vnc dependency if using vnc
 if ! [ $USE_NO_VNC = "yes" ]; then
-    print_info "noVNC service is not needed"
+    print_info "VNC service is not needed"
     exit 0
 fi
 
@@ -38,7 +38,7 @@ PAMName=login
 # NOTE %u not working for PIDFile since this is *not* "User=" https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Specifiers
 PIDFile=/home/${USER}/.vnc/%H%i.pid
 ExecStartPre=/bin/sh -c '/usr/bin/vncserver -kill %i > /dev/null 2>&1 || :'
-ExecStart=/usr/bin/vncserver %i -geometry 1366x768 -depth 24 -localhost no -fg
+ExecStart=/usr/bin/vncserver %i -geometry 1920x1080 -depth 24 -localhost no -fg
 ExecStop=/bin/sh -c '/usr/bin/vncserver -kill %i > /dev/null 2>&1 || :'
 
 [Install]
