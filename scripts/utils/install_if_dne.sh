@@ -6,8 +6,8 @@ install_if_dne() {
     for item in "$@"; do
         if ! command -v $item > /dev/null
         then
-            print_info "Update package index..."
             if [ $_UPDATED = "no" ]; then
+                print_info "Update package index..."
                 sudo apt-get update -qq -y
                 _UPDATED=yes
             fi
@@ -16,4 +16,10 @@ install_if_dne() {
             print_info "$item installed successfully"
         fi
     done
+    if [ $_UPDATED = "yes" ]; then
+        # clean package list
+        print_info "Clean up package and pkg list"
+        sudo apt-get clean
+        sudo rm -rf /var/lib/apt/lists/*
+    fi
 }
