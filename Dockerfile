@@ -98,9 +98,22 @@ WORKDIR /home/${USER}
 # set user password
 RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
 # clean up package cache
-RUN sudo apt-get clean && \
-    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-CMD [ "./scripts/run-with-utils.sh", \
-    "start_all_plugins_in", \
-    "./scripts" ]
+# Switch back to root to start systemd
+USER root
+
+# Remove unnecessary system targets
+# TODO remove more targets but make sure that startup completes and login promt is displayed when "docker run -it"
+#   https://github.com/moby/moby/issues/42275#issue-853601974
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* \
+    /tmp/* \
+    /var/tmp/* \
+    /lib/systemd/system/local-fs.target.wants/* \
+    /lib/systemd/system/sockets.target.wants/*udev* \
+    /lib/systemd/system/sockets.target.wants/*initctl* \
+    /lib/systemd/system/sysinit.target.wants/systemd-tmpfiles-setup* \
+    /lib/systemd/system/systemd-update-utmp* \
+    /lib/systemd/system/systemd-resolved.service
+
+CMD [ "/sbin/init" ]
