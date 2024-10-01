@@ -105,6 +105,13 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_NO_VNC = "yes" ]] && echo "-p $NO_VNC_PORT:6901") \
                     $([[ $USE_SSH = "yes" ]] && echo "-p $SSH_PORT:22") \
                     $([[ $USE_GPU = "yes" ]] && echo "--runtime=nvidia --gpus all") \
+                    --tmpfs /run \
+                    --tmpfs /run/lock \
+                    --tmpfs /tmp \
+                    --cgroupns host \
+                    --cap-add SYS_BOOT \
+                    --cap-add SYS_ADMIN \
+                    -v /sys/fs/cgroup:/sys/fs/cgroup \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
                     ${IMG_NAME}

@@ -1,6 +1,8 @@
 ARG BASE_IMG="ubuntu:20.04"
 FROM ${BASE_IMG}
 
+ENV container=docker
+
 ARG USER="user"
 ENV USER "${USER}"
 
@@ -26,8 +28,31 @@ ENV NVIDIA_VISIBLE_DEVICES \
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
-    apt-get update -qq -y && apt-get upgrade -qq -y && \
+# Set locale
+ENV LANG=C.UTF-8
+# ENV LC_ALL=C.UTF-8
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    locales && \
+    echo "$LANG UTF-8" >> /etc/locale.gen && \
+    locale-gen && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Unminimize to include man pages
+RUN yes | unminimize
+
+# Install systemd
+RUN apt-get update && apt-get install -y \
+    dbus dbus-x11 systemd && \
+    dpkg-divert --local --rename --add /sbin/udevadm && \
+    ln -s /bin/true /sbin/udevadm
+VOLUME ["/sys/fs/cgroup"]
+STOPSIGNAL SIGRTMIN+3
+
+# Setup user, after sudo user created and set,
+# the commands that needs root priviledge needs "sudo"
+# RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
+RUN apt-get update -qq -y && apt-get upgrade -qq -y && \
     apt-get install -qq -y sudo unzip && \
     useradd -m -G sudo "${USER}" && \
     echo "${USER} ALL = NOPASSWD: ALL" > /etc/sudoers.d/"${USER}" && \
