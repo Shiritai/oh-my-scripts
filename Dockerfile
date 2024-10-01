@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN yes | unminimize
 
 # Install systemd
-RUN apt-get update && apt-get install -y \
+RUN apt-get update -qq && apt-get install -qq -y \
     dbus dbus-x11 systemd && \
     dpkg-divert --local --rename --add /sbin/udevadm && \
     ln -s /bin/true /sbin/udevadm
