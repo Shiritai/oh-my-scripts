@@ -28,19 +28,21 @@ sudo openssl req -new \
 cd utils
 sudo git clone https://github.com/novnc/websockify
 
-echo "[Unit]
+if [ ${USE_SYSTEMD} = yes ]; then
+    echo "[Unit]
 Description=noVNC remote desktop server
 After=tigervnc@:1.service
- 
+
 [Service]
 Type=simple
 User=${USER}
 ExecStart=/usr/share/noVNC/utils/novnc_proxy --vnc :5901 --listen 6901
- 
+
 [Install]
 WantedBy=multi-user.target" | sudo tee /etc/systemd/system/novnc.service
 
-sudo systemctl enable novnc
+    sudo systemctl enable novnc
+fi
 
 print_info "Install numpy for better noVNC performance"
 

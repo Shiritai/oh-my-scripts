@@ -24,8 +24,9 @@ install_if_dne tigervnc-common \
                tigervnc-viewer \
                tigervnc-xorg-extension
 
-# Create tigervnc service file, with customizable user name, and enable it
-echo "# TODO wait for release of official service file: https://github.com/TigerVNC/tigervnc/pull/838
+if [ ${USE_SYSTEMD} = yes ]; then
+    # Create tigervnc service file, with customizable user name, and enable it
+    echo "# TODO wait for release of official service file: https://github.com/TigerVNC/tigervnc/pull/838
 [Unit]
 Description=TigerVNC remote desktop service
 # TODO add dbus target? "systemctl --user start dbus" before starting gnome might fix logout issue
@@ -44,7 +45,8 @@ ExecStop=/bin/sh -c '/usr/bin/vncserver -kill %i > /dev/null 2>&1 || :'
 [Install]
 WantedBy=multi-user.target" | sudo tee /etc/systemd/system/tigervnc@.service
 
-sudo systemctl enable tigervnc@:1
+    sudo systemctl enable tigervnc@:1
+fi
 
 # Setup vnc x11 startup
 mkdir $HOME/.vnc

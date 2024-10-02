@@ -9,6 +9,9 @@ SCRIPT_DIR=$(realpath $(dirname $0))
 BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
 IMG_NAME=${IMG_NAME:-oh-my-c}
 
+# Systemd support
+USE_SYSTEMD=${USE_SYSTEMD:-yes} # yes or no
+
 # Feel free to change user password if needed
 USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
@@ -85,6 +88,7 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
     sudo docker build -t $IMG_NAME \
                       --platform linux/amd64 \
                       --build-arg BASE_IMG="${BASE_IMG}" \
+                      --build-arg USE_SYSTEMD="${USE_SYSTEMD}" \
                       --build-arg USER="${USER}" \
                       --build-arg USER_PSWD="${USER_PSWD}" \
                       --build-arg VNC_PSWD="${VNC_PSWD}" \
@@ -102,16 +106,12 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
     # run container
     sudo docker run -d -it \
                     $([[ $USE_MOUNT_DIR = "yes" ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
+                    $([[ $USE_GPU = "yes" ]] && echo "--gpus all") \
+                    $([[ $USE_SYSTEMD = "yes" ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
+                                                          --cap-add SYS_BOOT --cap-add SYS_ADMIN
+                                                          --cgroupns host -v /sys/fs/cgroup:/sys/fs/cgroup") \
                     $([[ $USE_NO_VNC = "yes" ]] && echo "-p $NO_VNC_PORT:6901") \
                     $([[ $USE_SSH = "yes" ]] && echo "-p $SSH_PORT:22") \
-                    $([[ $USE_GPU = "yes" ]] && echo "--runtime=nvidia --gpus all") \
-                    --tmpfs /run \
-                    --tmpfs /run/lock \
-                    --tmpfs /tmp \
-                    --cgroupns host \
-                    --cap-add SYS_BOOT \
-                    --cap-add SYS_ADMIN \
-                    -v /sys/fs/cgroup:/sys/fs/cgroup \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
                     ${IMG_NAME}

@@ -3,6 +3,9 @@ FROM ${BASE_IMG}
 
 ENV container=docker
 
+ARG USE_SYSTEMD="yes"
+ENV USE_SYSTEMD "${USE_SYSTEMD}"
+
 ARG USER="user"
 ENV USER "${USER}"
 
@@ -42,16 +45,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN yes | unminimize
 
 # Install systemd
-RUN apt-get update -qq && apt-get install -qq -y \
+RUN [ ${USE_SYSTEMD} = yes ] && \
+    apt-get update -qq && apt-get install -qq -y \
     dbus dbus-x11 systemd && \
     dpkg-divert --local --rename --add /sbin/udevadm && \
     ln -s /bin/true /sbin/udevadm
-VOLUME ["/sys/fs/cgroup"]
-STOPSIGNAL SIGRTMIN+3
 
 # Setup user, after sudo user created and set,
 # the commands that needs root priviledge needs "sudo"
-# RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone && \
 RUN apt-get update -qq -y && apt-get upgrade -qq -y && \
     apt-get install -qq -y sudo unzip && \
     useradd -m -G sudo "${USER}" && \
