@@ -16,8 +16,3 @@ invoke_all_plugins_scripts_in() {
 setup_all_plugins_in() {
     invoke_all_plugins_scripts_in setup.sh $1
 }
-
-start_all_plugins_in() {
-    invoke_all_plugins_scripts_in start.sh $1
-    bash
-}
