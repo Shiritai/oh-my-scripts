@@ -2,6 +2,12 @@
 
 SCRIPT_DIR=$(realpath $(dirname $0))
 
+# only install noVNC dependency if using it
+if ! [ $USE_NO_VNC = "yes" ]; then
+    print_info "noVNC service is not needed"
+    exit 0
+fi
+
 print_info "setting up noVNC"
 
 install_if_dne git

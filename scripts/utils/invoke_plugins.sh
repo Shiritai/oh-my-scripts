@@ -7,7 +7,7 @@ invoke_all_plugins_scripts_in() {
         if is_dir $sub_element; then
             invoke_all_plugins_scripts_in $1 $sub_element
         elif ends_with $sub_element $1; then
-            print_info "Find $1:  $sub_element"
+            print_info "Find $1: $sub_element"
             $sub_element
         fi
     done

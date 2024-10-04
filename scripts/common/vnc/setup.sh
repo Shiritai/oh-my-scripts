@@ -3,7 +3,7 @@
 SCRIPT_DIR=$(realpath $(dirname $0))
 
 # only install vnc dependency if using vnc
-if ! [ $USE_NO_VNC = "yes" ]; then
+if ! [ $USE_VNC = "yes" ]; then
     print_info "VNC service is not needed"
     exit 0
 fi

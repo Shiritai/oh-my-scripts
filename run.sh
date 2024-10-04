@@ -17,12 +17,19 @@ USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
 USE_GPU=${USE_GPU:-no} # yes or no
 
-VNC_PSWD=${VNC_PSWD:-"vncpswd"}
 USE_NO_VNC=${USE_NO_VNC:-no} # yes or no
-NO_VNC_PORT=${NO_VNC_PORT:-6901} # port of host to open for noVNC
+# port of host to open for noVNC
+NO_VNC_PORT=${NO_VNC_PORT:-6901}
+
+USE_VNC=${USE_VNC:-$(([ $USE_NO_VNC = yes ] && echo yes) || echo no)} # yes or no
+VNC_PSWD=${VNC_PSWD:-"vncpswd"}
+# port of host to open for vnc,
+# default to none (not open) since vnc is more handy
+VNC_PORT=${VNC_PORT:-none}
 
 USE_SSH=${USE_SSH:-no} # yes or no
-SSH_PORT=${SSH_PORT:-22} # port of host to open for ssh
+# port of host to open for ssh
+SSH_PORT=${SSH_PORT:-22}
 
 # oh-my-scripts running mode
 # b: build only
@@ -91,6 +98,8 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg USE_SYSTEMD="${USE_SYSTEMD}" \
                       --build-arg USER="${USER}" \
                       --build-arg USER_PSWD="${USER_PSWD}" \
+                      --build-arg USE_SSH="${USE_SSH}" \
+                      --build-arg USE_VNC="${USE_VNC}" \
                       --build-arg VNC_PSWD="${VNC_PSWD}" \
                       --build-arg USE_NO_VNC="${USE_NO_VNC}" \
                       . 2>&1 | tee build.log
@@ -110,7 +119,8 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_SYSTEMD = "yes" ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
                                                           --cap-add SYS_BOOT --cap-add SYS_ADMIN
                                                           --cgroupns host -v /sys/fs/cgroup:/sys/fs/cgroup") \
-                    $([[ $USE_NO_VNC = "yes" ]] && echo "-p $NO_VNC_PORT:6901") \
+                    $([[ $USE_VNC = "yes" && $VNC_PORT != none ]] && echo "-p $VNC_PORT:5901") \
+                    $([[ $USE_NO_VNC = "yes" && $NO_VNC_PORT != none ]] && echo "-p $NO_VNC_PORT:6901") \
                     $([[ $USE_SSH = "yes" ]] && echo "-p $SSH_PORT:22") \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \

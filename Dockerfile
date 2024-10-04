@@ -2,27 +2,7 @@ ARG BASE_IMG="ubuntu:20.04"
 FROM ${BASE_IMG}
 
 ENV container=docker
-
-ARG USE_SYSTEMD="yes"
-ENV USE_SYSTEMD "${USE_SYSTEMD}"
-
-ARG USER="user"
-ENV USER "${USER}"
-
-ARG TZ="Asia/Taipei"
-
-ARG USER_PSWD="CHANGE_ME"
-ENV USER_PSWD "${USER_PSWD}"
-
-ARG USE_NO_VNC=no
-ENV USE_NO_VNC "${USE_NO_VNC}"
-
-ARG VNC_PSWD="vncpswd"
-ENV VNC_PSWD "${VNC_PSWD}"
-
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE DontWarn
-
-# Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND noninteractive
 
 # nvidia-container-runtime
@@ -41,19 +21,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Unminimize to include man pages
-RUN yes | unminimize
-
 # Install systemd
+ARG USE_SYSTEMD="yes"
 RUN [ ${USE_SYSTEMD} = yes ] && \
-    apt-get update -qq && apt-get install -qq -y \
-    dbus dbus-x11 systemd && \
-    dpkg-divert --local --rename --add /sbin/udevadm && \
-    ln -s /bin/true /sbin/udevadm
+    echo -e "[\e[1;34mINFO\e[0m] Use systemd" && \
+    apt-get update -qq -y && \
+    apt-get install -qq -y dbus dbus-x11 systemd > /dev/null
 
 # Setup user, after sudo user created and set,
 # the commands that needs root priviledge needs "sudo"
-RUN apt-get update -qq -y && apt-get upgrade -qq -y && \
+ARG USER="user"
+ENV USER "${USER}"
+RUN echo -e "[\e[1;34mINFO\e[0m] Setup user $USER" && \
+    apt-get update -qq -y && \
+    apt-get upgrade -qq -y && \
     apt-get install -qq -y sudo unzip && \
     useradd -m -G sudo "${USER}" && \
     echo "${USER} ALL = NOPASSWD: ALL" > /etc/sudoers.d/"${USER}" && \
@@ -69,6 +50,20 @@ RUN sudo chown -R ${USER} /home/${USER}/scripts && \
     sudo unzip /home/${USER}/scripts-utils.zip -d /home/${USER} && \
     rm /home/${USER}/scripts-utils.zip
 COPY scripts/run-with-utils.sh /home/${USER}/scripts
+
+# Environment variables to decide which package to be installed.
+# These environment variable will be read by setup scripts.
+ARG USE_SSH=no
+ENV USE_SSH "${USE_SSH}"
+
+ARG USE_VNC=no
+ENV USE_VNC "${USE_VNC}"
+
+ARG USE_NO_VNC=no
+ENV USE_NO_VNC "${USE_NO_VNC}"
+
+ARG VNC_PSWD="vncpswd"
+ENV VNC_PSWD "${VNC_PSWD}"
 
 # Install common plugins
 COPY scripts-common.zip /home/${USER}
@@ -94,9 +89,9 @@ RUN sudo chown -R ${USER} /home/${USER}/scripts && \
     /home/${USER}/scripts/run-with-utils.sh \
     setup_all_plugins_in /home/${USER}/scripts/dev
 
-WORKDIR /home/${USER}
-
 # set user password
+ARG USER_PSWD="CHANGE_ME"
+ENV USER_PSWD "${USER_PSWD}"
 RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
 
 # Switch back to root to start systemd

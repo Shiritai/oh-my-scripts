@@ -4,7 +4,7 @@
 install_if_dne() {
     _UPDATED=no
     for item in "$@"; do
-        if ! command -v $item > /dev/null
+        if [[ -z $(sudo apt -qq list $item --installed 2>/dev/null) ]]
         then
             if [ $_UPDATED = "no" ]; then
                 print_info "Update package index..."
@@ -12,7 +12,7 @@ install_if_dne() {
                 _UPDATED=yes
             fi
             print_info "$item DNE, install it..."
-            sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y $item > /dev/null
+            sudo apt-get install -qq -y $item > /dev/null
             print_info "$item installed successfully"
         fi
     done
