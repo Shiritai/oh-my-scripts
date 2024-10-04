@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# only install ssh dependency if using it
+if ! [ $USE_OMZ = "yes" ]; then
+    print_info "oh-my-zsh is not needed"
+    exit 0
+fi
+
+print_info "Need oh-my-zsh, installing it"
+
 SCRIPT_DIR=$(realpath $(dirname $0))
 
 # setup oh-my-zsh and its dependencies
@@ -26,10 +34,6 @@ check_or_install_omz() {
         print_info "Checking ${tars[$i]}..."
         if [ ! -d ${tars[$i]} ] ; then git clone https://github.com/${links[$i]} ${tars[$i]} ; fi
     done
-    
-    # setup zsh script, notice that zshrc is set by oh-my-zsh
-    # we should override .zshrc even if it exists
-    cp $SCRIPT_DIR/.zshrc ~
 
     # download and install meslo nerd font
     links=( MesloLGS%20NF%20Regular.ttf MesloLGS%20NF%20Bold.ttf MesloLGS%20NF%20Italic.ttf MesloLGS%20NF%20Bold%20Italic.ttf )
@@ -41,19 +45,14 @@ check_or_install_omz() {
 
 # setup zsh scripts
 check_or_setup_scripts() {
-    # setup powerlevel10k script
-    if [ ! -f ~/.p10k.zsh ]
-    then
-        print_info "$USER haven't use p10k yet, setting up p10k..."
-        cp $SCRIPT_DIR/.p10k.zsh ~
-    fi
-
-    # setup zsh script
-    if [ ! -f ~/.zshrc ]
-    then
-        print_info "$USER haven't use zsh yet, setting up zsh..."
-        cp $SCRIPT_DIR/.zshrc ~
-    fi
+    # setup dotfiles
+    for item in $(ls -d $SCRIPT_DIR/.*); do
+        if [ -f $item ]
+        then
+            print_info "Find zsh-related dotfile: $item, put it into ${HOME}"
+            cp $item ~
+        fi
+    done
 }
 
 install_if_dne vim unzip zsh git curl wget fontconfig
