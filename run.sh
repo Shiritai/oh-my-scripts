@@ -24,6 +24,8 @@ NO_VNC_PORT=${NO_VNC_PORT:-6901} # port of host to open for noVNC
 USE_SSH=${USE_SSH:-no} # yes or no
 SSH_PORT=${SSH_PORT:-22} # port of host to open for ssh
 
+USE_APP=${USE_APP:-no} # yes or no
+
 # oh-my-scripts running mode
 # b: build only
 # r: run only
@@ -77,6 +79,8 @@ if ! [[ -f scripts-utils.zip ]]; then zip -r scripts-utils.zip scripts/utils; fi
 if ! [[ -f scripts-common.zip ]]; then zip -r scripts-common.zip scripts/common; fi
 # zip custom scripts once, since files here seldom changes
 if ! [[ -f scripts-custom.zip ]]; then zip -r scripts-custom.zip scripts/custom; fi
+# zip app scripts once, since files here seldom changes
+if ! [[ -f scripts-app.zip && $USE_APP = "yes" ]]; then zip -r scripts-app.zip scripts/app; fi
 # re-zip dev (custom) scripts everytime
 zip -r scripts-dev.zip scripts/dev
 
@@ -93,6 +97,7 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg USER_PSWD="${USER_PSWD}" \
                       --build-arg VNC_PSWD="${VNC_PSWD}" \
                       --build-arg USE_NO_VNC="${USE_NO_VNC}" \
+                      --build-arg USE_APP="${USE_APP}" \
                       . 2>&1 | tee build.log
 fi
 
