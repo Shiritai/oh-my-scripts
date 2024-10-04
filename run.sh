@@ -123,17 +123,17 @@ rm scripts-dev.zip
 if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
     # run container
     sudo docker run -d -it \
-                    $([[ $USE_MOUNT_DIR = "yes" ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
-                    $([[ $USE_GPU = "yes" ]] && echo "--gpus all") \
-                    $([[ $USE_SYSTEMD = "yes" ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
+                    $([[ $USE_MOUNT_DIR = yes ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
+                    $([[ $USE_GPU = yes ]] && echo "--gpus all") \
+                    $([[ $USE_SYSTEMD = yes ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
                                                           --cap-add SYS_BOOT --cap-add SYS_ADMIN
                                                           --cgroupns host -v /sys/fs/cgroup:/sys/fs/cgroup") \
-                    $([[ $USE_VNC = "yes" && $VNC_PORT != none ]] && echo "-p $VNC_PORT:5901") \
-                    $([[ $USE_NO_VNC = "yes" && $NO_VNC_PORT != none ]] && echo "-p $NO_VNC_PORT:6901") \
-                    $([[ $USE_SSH = "yes" ]] && echo "-p $SSH_PORT:22") \
+                    $([[ $USE_VNC = yes && $VNC_PORT != none ]] && echo "-p $VNC_PORT:5901") \
+                    $([[ $USE_NO_VNC = yes && $NO_VNC_PORT != none ]] && echo "-p $NO_VNC_PORT:6901") \
+                    $([[ $USE_SSH = yes ]] && echo "-p $SSH_PORT:22") \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
-                    ${IMG_NAME}
+                    ${IMG_NAME} $([[ $USE_SYSTEMD != yes ]] && echo "/bin/bash")
 fi
 
 # stack 1: go back to old working directory

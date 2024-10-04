@@ -21,10 +21,10 @@ RUN echo -e "[\e[1;34mINFO\e[0m] Setup locale to ${LOCALE} and timezone to ${TZ}
 
 # Install systemd
 ARG USE_SYSTEMD="yes"
-RUN [ ${USE_SYSTEMD} = yes ] && \
+RUN ([ ${USE_SYSTEMD} = yes ] && \
     echo -e "[\e[1;34mINFO\e[0m] Use systemd" && \
     apt-get update -qq -y && \
-    apt-get install -qq -y dbus dbus-x11 systemd > /dev/null
+    apt-get install -qq -y dbus dbus-x11 systemd > /dev/null) || true
 
 # Setup user, after sudo user created and set,
 # the commands that needs root priviledge needs "sudo"
@@ -95,7 +95,7 @@ ARG USER_PSWD="CHANGE_ME"
 ENV USER_PSWD "${USER_PSWD}"
 RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
 
-# Switch back to root to start systemd
+# Switch back to root to start systemd (when USE_SYSTEMD is set)
 USER root
 
 # Remove unnecessary system targets
