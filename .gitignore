@@ -13,3 +13,4 @@ data
 
 # specific file to hide (sensitive files)
 scripts/common/no-vnc/openssl-req.conf
+scripts/common/zsh/.*
