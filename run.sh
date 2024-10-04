@@ -9,6 +9,9 @@ SCRIPT_DIR=$(realpath $(dirname $0))
 BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
 IMG_NAME=${IMG_NAME:-oh-my-c}
 
+LOCALE=${LOCALE:-$(locale -a | grep -v C | grep -v POSIX | head -n 1)}
+TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+")}
+
 # Systemd support
 USE_SYSTEMD=${USE_SYSTEMD:-yes} # yes or no
 
@@ -98,6 +101,8 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
     sudo docker build -t $IMG_NAME \
                       --platform linux/amd64 \
                       --build-arg BASE_IMG="${BASE_IMG}" \
+                      --build-arg LOCALE="${LOCALE}" \
+                      --build-arg TZ="${TZ}" \
                       --build-arg USE_SYSTEMD="${USE_SYSTEMD}" \
                       --build-arg USER="${USER}" \
                       --build-arg USER_PSWD="${USER_PSWD}" \

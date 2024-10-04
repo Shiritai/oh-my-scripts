@@ -5,19 +5,17 @@ ENV container=docker
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE DontWarn
 ENV DEBIAN_FRONTEND noninteractive
 
-# nvidia-container-runtime
-ENV NVIDIA_VISIBLE_DEVICES \
-    ${NVIDIA_VISIBLE_DEVICES:-all}
-ENV NVIDIA_DRIVER_CAPABILITIES \
-    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+ARG LOCALE="C.UTF-8"
+ARG TZ="Asia/Tokyo"
 
-# Set locale
-ENV LANG=C.UTF-8
-# ENV LC_ALL=C.UTF-8
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    locales && \
-    echo "$LANG UTF-8" >> /etc/locale.gen && \
+# Set locale and timezone
+RUN echo -e "[\e[1;34mINFO\e[0m] Setup locale to ${LOCALE} and timezone to ${TZ}" && \
+    apt-get update -qq && \
+    apt-get install -y -qq --no-install-recommends locales > /dev/null && \
+    echo "$LOCALE UTF-8" >> /etc/locale.gen && \
     locale-gen && \
+    ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
+    echo ${TZ} > /etc/timezone && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
