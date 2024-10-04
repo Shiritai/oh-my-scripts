@@ -77,6 +77,18 @@ RUN sudo chown -R ${USER} /home/${USER}/scripts && \
     /home/${USER}/scripts/run-with-utils.sh \
     setup_all_plugins_in /home/${USER}/scripts/common
 
+# Install app plugins, always copy zip file in
+# and always remove them regardless of installing them or not
+ARG USE_APP=no
+COPY scripts-app.zip /home/${USER}
+RUN ([ "${USE_APP}" = "yes" ] && \
+    sudo chown -R ${USER} /home/${USER}/scripts && \
+    sudo unzip /home/${USER}/scripts-app.zip -d /home/${USER} && \
+    rm /home/${USER}/scripts-app.zip && \
+    /home/${USER}/scripts/run-with-utils.sh \
+    setup_all_plugins_in /home/${USER}/scripts/app) || \
+    rm /home/${USER}/scripts-app.zip
+
 # Install custom plugins
 COPY scripts-custom.zip /home/${USER}
 RUN sudo chown -R ${USER} /home/${USER}/scripts && \

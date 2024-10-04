@@ -34,11 +34,14 @@ USE_SSH=${USE_SSH:-no} # yes or no
 # port of host to open for ssh
 SSH_PORT=${SSH_PORT:-22}
 
+# use oh-my-zsh
+USE_OMZ=${USE_OMZ:-no} # yes or no
+
 # use gnome GUI
 USE_GUI=${USE_GUI:-no} # yes or no
 
-# use oh-my-zsh
-USE_OMZ=${USE_OMZ:-no}
+# use (GUI) app
+USE_APP=${USE_APP:-no} # yes or no
 
 # oh-my-scripts running mode
 # b: build only
@@ -93,6 +96,8 @@ if ! [[ -f scripts-utils.zip ]]; then zip -r scripts-utils.zip scripts/utils; fi
 if ! [[ -f scripts-common.zip ]]; then zip -r scripts-common.zip scripts/common; fi
 # zip custom scripts once, since files here seldom changes
 if ! [[ -f scripts-custom.zip ]]; then zip -r scripts-custom.zip scripts/custom; fi
+# zip app scripts once, since files here seldom changes
+if ! [[ -f scripts-app.zip && $USE_APP = "yes" ]]; then zip -r scripts-app.zip scripts/app; fi
 # re-zip dev (custom) scripts everytime
 zip -r scripts-dev.zip scripts/dev
 
@@ -115,6 +120,7 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg USE_NO_VNC="${USE_NO_VNC}" \
                       --build-arg USE_OMZ="${USE_OMZ}" \
                       --build-arg USE_GUI="${USE_GUI}" \
+                      --build-arg USE_APP="${USE_APP}" \
                       . 2>&1 | tee build.log
 fi
 
