@@ -65,6 +65,9 @@ ENV USE_NO_VNC "${USE_NO_VNC}"
 ARG VNC_PSWD="vncpswd"
 ENV VNC_PSWD "${VNC_PSWD}"
 
+ARG USE_GUI=no
+ENV USE_GUI "${USE_GUI}"
+
 # Install common plugins
 COPY scripts-common.zip /home/${USER}
 RUN sudo chown -R ${USER} /home/${USER}/scripts && \

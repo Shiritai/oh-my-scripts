@@ -31,6 +31,9 @@ USE_SSH=${USE_SSH:-no} # yes or no
 # port of host to open for ssh
 SSH_PORT=${SSH_PORT:-22}
 
+# use gnome GUI
+USE_GUI=${USE_GUI:-no} # yes or no
+
 # oh-my-scripts running mode
 # b: build only
 # r: run only
@@ -102,6 +105,7 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg USE_VNC="${USE_VNC}" \
                       --build-arg VNC_PSWD="${VNC_PSWD}" \
                       --build-arg USE_NO_VNC="${USE_NO_VNC}" \
+                      --build-arg USE_GUI="${USE_GUI}" \
                       . 2>&1 | tee build.log
 fi
 
