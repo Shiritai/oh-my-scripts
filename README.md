@@ -1,4 +1,6 @@
-# oh-my-scripts: The scripting tool for container environment build-up development
+# oh-my-scripts
+
+The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
 
 容器化 (Containerization) 是個好東西，它使快速建立、消除、移植相同環境等任務有著遠超於虛擬機的表現，使我們幾乎一瞬間就能利用他人建構好的 image 快速部署服務。
 
@@ -6,14 +8,15 @@
 
 有沒有方法能打破現狀呢？有沒有個工具可以大幅加速容器的開發？能提供開發者一套現成且易於重用的環境模板庫，讓開發者能更大限度地享受容器所帶來的優勢？這便是 `oh-my-scripts` 的目標。
 
-## 目標
+## 未來目標 Roadmap
 
-### 開發輔助
+### 開發輔助 Dev tools
 
+* **建立測試框架**
 * 容器運行後執行之命令的自動記錄 (命令 - 結果)，並進一步自動腳本化
 * 容器的建構平行化: 支援同時建立多個容器，其建構時的的差異只有一小部分，對這些差異和對應的容器建立 pair 來追蹤，方便開發者快速嘗試多種 build 的 image
 
-### 客製化輔助
+### 客製化輔助 Customize tools
 
 * 將參數指派做成互動式 / 非互動式的設定檔
 * 提供更靈活的容器外掛設定
@@ -21,9 +24,9 @@
   * 實作一個小型套件管理器 ?!
   * 為外掛建立 Dependency DAG
 
-## 用法
+## 用法 Usage
 
-### 介紹
+### 介紹 Introduction
 
 執行 `run.sh`。
 
@@ -66,7 +69,7 @@ USE_GPU=${USE_GPU:-no} # yes or no
 * 刪除產生的 `.dockerignore` 和 `scripts-dev.zip`
 * `docker run`
 
-### 放入客製化外掛
+### 放入客製化外掛 Add you own plugins
 
 請將客製化腳本放在 `scripts/custom` 或 `scripts/dev` 中:
 
@@ -75,11 +78,11 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 當您確認 `scripts/dev` 的某個外掛能穩定運作，可以將其移入 `scripts/custom`，如果已經執行過 `run.sh`，此時請刪除產生的 `scripts-custom.zip`。
 
-## 功能
+## 功能 Features
 
 目前支援下列功能。
 
-### 核心功能 in `Dockerfile`
+### 核心功能 Core features in `Dockerfile`
 
 > TODO: 可將其獨立成腳本
 
