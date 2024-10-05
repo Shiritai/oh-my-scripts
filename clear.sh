@@ -4,5 +4,8 @@ SCRIPT_DIR=$(realpath $(dirname $0))
 
 rm $SCRIPT_DIR/scripts-*
 
-sudo docker rm -f $1
-sudo docker image remove -f $1
+# if name of container is assigned as the first argument
+if ! [[ -z $1 ]]; then
+    sudo docker rm -f $1
+    sudo docker image remove -f $1
+fi

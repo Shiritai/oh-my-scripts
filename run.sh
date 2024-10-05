@@ -2,20 +2,20 @@
 
 # Script dependencies: `zip` and `docker`
 
-# Directory of this script, a.k.a. `oh-my-scripts`
-SCRIPT_DIR=$(realpath $(dirname $0))
+# ----------- [Customizable Parameters] -----------
 
-# Customizable variables
 BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
 IMG_NAME=${IMG_NAME:-oh-my-c}
 
 LOCALE=${LOCALE:-$(locale -a | grep -v C | grep -v POSIX | head -n 1)}
-TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+")}
+TZ=${TZ:-$(timedatectl show | grep -E "Timezone=" | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+")}
 
 # Systemd support
 USE_SYSTEMD=${USE_SYSTEMD:-yes} # yes or no
 
+USERNAME=${USERNAME:-$USER} # Username of the container
 # Feel free to change user password if needed
+USE_USER_PSWD=${USE_USER_PSWD:-"no"}
 USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
 USE_GPU=${USE_GPU:-no} # yes or no
@@ -49,6 +49,11 @@ USE_APP=${USE_APP:-no} # yes or no
 # br: build and run
 OMS_MODE=${OMS_MODE:-br}
 
+# ----------- [Execution Part] -----------
+
+# Directory of this script, a.k.a. `oh-my-scripts`
+SCRIPT_DIR=$(realpath $(dirname $0))
+
 get_absolute_path_if_is_relative() {
     if [[ "$1" = /* ]]; then # absolute, do nothing
         echo $1
@@ -65,8 +70,6 @@ CUSTOM_SCRIPTS_PATH=${CUSTOM_SCRIPTS_PATH:-$DEFAULT_CUSTOM_SCRIPTS_PATH}
 # If `CUSTOM_SCRIPTS_PATH` is relative (and is definetly
 # assigned by user), make it absolute
 CUSTOM_SCRIPTS_PATH=$(get_absolute_path_if_is_relative $CUSTOM_SCRIPTS_PATH)
-
-echo $CUSTOM_SCRIPTS_PATH
 
 # Mount path is customizable.
 # Assign `USE_MOUNT_DIR=yes` to enable mount path.
@@ -112,8 +115,7 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg LOCALE="${LOCALE}" \
                       --build-arg TZ="${TZ}" \
                       --build-arg USE_SYSTEMD="${USE_SYSTEMD}" \
-                      --build-arg USER="${USER}" \
-                      --build-arg USER_PSWD="${USER_PSWD}" \
+                      --build-arg USER="${USERNAME}" \
                       --build-arg USE_SSH="${USE_SSH}" \
                       --build-arg USE_VNC="${USE_VNC}" \
                       --build-arg VNC_PSWD="${VNC_PSWD}" \
@@ -121,6 +123,8 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg USE_OMZ="${USE_OMZ}" \
                       --build-arg USE_GUI="${USE_GUI}" \
                       --build-arg USE_APP="${USE_APP}" \
+                      --build-arg USE_USER_PSWD="${USE_USER_PSWD}" \
+                      --build-arg USER_PSWD="${USER_PSWD}" \
                       . 2>&1 | tee build.log
 fi
 

@@ -29,6 +29,7 @@ RUN ([ ${USE_SYSTEMD} = yes ] && \
 # Setup user, after sudo user created and set,
 # the commands that needs root priviledge needs "sudo"
 ARG USER="user"
+ARG HOME="/home/$USER"
 ENV USER "${USER}"
 RUN echo -e "[\e[1;34mINFO\e[0m] Setup user $USER" && \
     apt-get update -qq -y && \
@@ -38,16 +39,16 @@ RUN echo -e "[\e[1;34mINFO\e[0m] Setup user $USER" && \
     echo "${USER} ALL = NOPASSWD: ALL" > /etc/sudoers.d/"${USER}" && \
     chmod 0440 /etc/sudoers.d/"${USER}" && \
     passwd -d "${USER}" && \
-    mkdir /home/${USER}/scripts
+    mkdir $HOME/scripts
 
 USER "${USER}"
 
 # copy scripts to container
-COPY scripts-utils.zip /home/${USER}
-RUN sudo chown -R ${USER} /home/${USER}/scripts && \
-    sudo unzip /home/${USER}/scripts-utils.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-utils.zip
-COPY scripts/run-with-utils.sh /home/${USER}/scripts
+COPY scripts-utils.zip $HOME
+RUN sudo chown -R ${USER} $HOME/scripts && \
+    sudo unzip $HOME/scripts-utils.zip -d $HOME && \
+    rm $HOME/scripts-utils.zip
+COPY scripts/run-with-utils.sh $HOME/scripts
 
 # Environment variables to decide which package to be installed.
 # These environment variable will be read by setup scripts.
@@ -70,45 +71,46 @@ ARG USE_GUI=no
 ENV USE_GUI "${USE_GUI}"
 
 # Install common plugins
-COPY scripts-common.zip /home/${USER}
-RUN sudo chown -R ${USER} /home/${USER}/scripts && \
-    sudo unzip /home/${USER}/scripts-common.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-common.zip && \
-    /home/${USER}/scripts/run-with-utils.sh \
-    setup_all_plugins_in /home/${USER}/scripts/common
+COPY scripts-common.zip $HOME
+RUN sudo chown -R ${USER} $HOME/scripts && \
+    sudo unzip $HOME/scripts-common.zip -d $HOME && \
+    rm $HOME/scripts-common.zip && \
+    $HOME/scripts/run-with-utils.sh \
+    setup_all_plugins_in $HOME/scripts/common
 
 # Install app plugins, always copy zip file in
 # and always remove them regardless of installing them or not
 ARG USE_APP=no
-COPY scripts-app.zip /home/${USER}
+COPY scripts-app.zip $HOME
 RUN ([ "${USE_APP}" = "yes" ] && \
-    sudo chown -R ${USER} /home/${USER}/scripts && \
-    sudo unzip /home/${USER}/scripts-app.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-app.zip && \
-    /home/${USER}/scripts/run-with-utils.sh \
-    setup_all_plugins_in /home/${USER}/scripts/app) || \
-    rm /home/${USER}/scripts-app.zip
+    sudo chown -R ${USER} $HOME/scripts && \
+    sudo unzip $HOME/scripts-app.zip -d $HOME && \
+    rm $HOME/scripts-app.zip && \
+    $HOME/scripts/run-with-utils.sh \
+    setup_all_plugins_in $HOME/scripts/app) || \
+    rm $HOME/scripts-app.zip
 
 # Install custom plugins
-COPY scripts-custom.zip /home/${USER}
-RUN sudo chown -R ${USER} /home/${USER}/scripts && \
-    sudo unzip /home/${USER}/scripts-custom.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-custom.zip && \
-    /home/${USER}/scripts/run-with-utils.sh \
-    setup_all_plugins_in /home/${USER}/scripts/custom
+COPY scripts-custom.zip $HOME
+RUN sudo chown -R ${USER} $HOME/scripts && \
+    sudo unzip $HOME/scripts-custom.zip -d $HOME && \
+    rm $HOME/scripts-custom.zip && \
+    $HOME/scripts/run-with-utils.sh \
+    setup_all_plugins_in $HOME/scripts/custom
 
 # Install dev plugins
-COPY scripts-dev.zip /home/${USER}
-RUN sudo chown -R ${USER} /home/${USER}/scripts && \
-    sudo unzip /home/${USER}/scripts-dev.zip -d /home/${USER} && \
-    rm /home/${USER}/scripts-dev.zip && \
-    /home/${USER}/scripts/run-with-utils.sh \
-    setup_all_plugins_in /home/${USER}/scripts/dev
+COPY scripts-dev.zip $HOME
+RUN sudo chown -R ${USER} $HOME/scripts && \
+    sudo unzip $HOME/scripts-dev.zip -d $HOME && \
+    rm $HOME/scripts-dev.zip && \
+    $HOME/scripts/run-with-utils.sh \
+    setup_all_plugins_in $HOME/scripts/dev
 
 # set user password
 ARG USER_PSWD="CHANGE_ME"
-ENV USER_PSWD "${USER_PSWD}"
-RUN echo "${USER}:${USER_PSWD}" | sudo chpasswd
+ARG USE_USER_PSWD="no"
+RUN ([ $USE_USER_PSWD = yes ] && \
+    echo "${USER}:${USER_PSWD}" | sudo chpasswd) || true
 
 # Switch back to root to start systemd (when USE_SYSTEMD is set)
 USER root
