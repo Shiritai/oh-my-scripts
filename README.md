@@ -27,7 +27,7 @@
 
 執行 `run.sh`。
 
-其有許多參數，可參閱 `run.sh` 前半部 `Parameters Part` 做變數的設定。
+其有許多參數，可參閱 `run.sh` 前半部 `Customizable Parameters` 做變數的設定。
 
 (TODO: 非設定命令行參數的的參數化)
 
@@ -48,7 +48,10 @@ $USERNAME=${$USERNAME:-$USER} # Username of the container
 USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 
 USE_GPU=${USE_GPU:-no} # yes or no
+
 # ...
+
+# ----------- [Execution Part] -----------
 ```
 
 `run.sh` 會依序:
@@ -82,17 +85,13 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 核心功能部分可選，皆可客製化。
 
-`標記的全大寫文字` 為可調參數。
-
-* 設定 locale `LOCALE` 和 timezone `TZ` (default to the same as the host)
-* Systemd `USE_SYSTEMD` (optional, default to `yes`)
-* User `USERNAME` (default to the same name of the host user)
 
 |功能|旗標|預設值|備注|
 |:-:|:-:|:-:|:-:|
 |locale|`LOCALE`|as host||
 |timezone|`TZ`|as host||
 |systemd|`USE_SYSTEMD`|yes||
+|user name|`USERNAME`|as current user||
 |user password|`USE_USER_PSWD`|no|`USER_PSWD` default to `CHANGE_ME`|
 
 ### 基本功能 `common`
