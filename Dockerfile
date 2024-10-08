@@ -66,7 +66,7 @@ RUN USE_SYSTEMD=${USE_SYSTEMD} \
     USE_GUI=${USE_GUI} \
     $HOME/scripts/unpack-and-install.sh common
 
-# Install app plugins, always copy zip file into the image
+# Install app plugins, always copy the file into the image
 # and remove them regardless of installing them or not
 ARG USE_APP=no
 COPY scripts-app.zip $HOME
@@ -105,4 +105,5 @@ RUN apt-get clean && \
     /lib/systemd/system/systemd-update-utmp* \
     /lib/systemd/system/systemd-resolved.service
 
-CMD [ "/sbin/init" ]
+# Default to bash, override to `/sbin/init` in run if `USE_SYSTEMD` is enabled
+CMD [ "/bin/bash" ]

@@ -153,7 +153,7 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_SSH = yes ]] && echo "-p $SSH_PORT:22") \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
-                    ${IMG_NAME} $([[ $USE_SYSTEMD != yes ]] && echo "/bin/bash")
+                    ${IMG_NAME} $([[ $USE_SYSTEMD = yes ]] && echo "/sbin/init")
 fi
 
 # stack 1: go back to old working directory
