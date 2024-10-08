@@ -43,6 +43,23 @@ USE_GUI=${USE_GUI:-no} # yes or no
 # use (GUI) app
 USE_APP=${USE_APP:-no} # yes or no
 
+# Mount path is customizable.
+# Assign `USE_MOUNT_DIR=yes` to enable mount path.
+USE_MOUNT_DIR=${USE_MOUNT_DIR:-no} # yes or no, no means do not mount volume
+MOUNT_DIR=${MOUNT_DIR:-"$SCRIPT_DIR/data"}
+
+# Script path related settings
+
+# `custom`
+DEFAULT_CUSTOM_SCRIPTS_PATH=$SCRIPT_DIR/scripts/custom
+# Path of custom scripts is customizable
+CUSTOM_SCRIPTS_PATH=${CUSTOM_SCRIPTS_PATH:-$DEFAULT_CUSTOM_SCRIPTS_PATH}
+
+# `dev`
+DEFAULT_DEV_SCRIPTS_PATH=$SCRIPT_DIR/scripts/dev
+# Path of dev scripts is customizable
+DEV_SCRIPTS_PATH=${DEV_SCRIPTS_PATH:-$DEFAULT_DEV_SCRIPTS_PATH}
+
 # oh-my-scripts running mode
 # b: build only
 # r: run only
@@ -62,19 +79,14 @@ get_absolute_path_if_is_relative() {
     fi
 }
 
-DEFAULT_CUSTOM_SCRIPTS_PATH=$SCRIPT_DIR/scripts/custom
-CUSTOM_SCRIPTS_PATH=${CUSTOM_SCRIPTS_PATH:-$DEFAULT_CUSTOM_SCRIPTS_PATH}
-# Path of custom scripts is also customizable.
-# Your own custom scripts will be copied to `custom`
-# directory of this repo everytime you run this script.
 # If `CUSTOM_SCRIPTS_PATH` is relative (and is definetly
 # assigned by user), make it absolute
 CUSTOM_SCRIPTS_PATH=$(get_absolute_path_if_is_relative $CUSTOM_SCRIPTS_PATH)
 
-# Mount path is customizable.
-# Assign `USE_MOUNT_DIR=yes` to enable mount path.
-USE_MOUNT_DIR=${USE_MOUNT_DIR:-no} # yes or no, no means do not mount volume
-MOUNT_DIR=${MOUNT_DIR:-"$SCRIPT_DIR/data"}
+# If `DEV_SCRIPTS_PATH` is relative (and is definetly
+# assigned by user), make it absolute
+DEV_SCRIPTS_PATH=$(get_absolute_path_if_is_relative $DEV_SCRIPTS_PATH)
+
 # After `USE_MOUNT_DIR=yes`, assign `MOUNT_DIR=VOLUME_TO_MOUNT`.
 # If `MOUNT_DIR` is relative (and is definetly
 # assigned by user), make it absolute.
@@ -84,25 +96,17 @@ MOUNT_DIR=$(get_absolute_path_if_is_relative $MOUNT_DIR)
 OLD_DIR=$pwd
 cd $SCRIPT_DIR
 
-# stack 1.5: copy custom scripts if the path is assigned
-# Note: the copied custom scripts will not be removed automatically
-# since we can't make sure which file/directory in custom is
-# placed by the user or copied by this scripts
-if [[ $CUSTOM_SCRIPTS_PATH != $DEFAULT_CUSTOM_SCRIPTS_PATH ]] ; then
-    cp -r ${CUSTOM_SCRIPTS_PATH}/* $DEFAULT_CUSTOM_SCRIPTS_PATH
-fi
-
 # stack 2: zip scripts to a single file for image building
 # zip util scripts once, since files here seldom changes
 if ! [[ -f scripts-utils.zip ]]; then zip -r scripts-utils.zip scripts/utils; fi
 # zip common scripts once, since files here seldom changes
 if ! [[ -f scripts-common.zip ]]; then zip -r scripts-common.zip scripts/common; fi
 # zip custom scripts once, since files here seldom changes
-if ! [[ -f scripts-custom.zip ]]; then zip -r scripts-custom.zip scripts/custom; fi
+if ! [[ -f scripts-custom.zip ]]; then zip -r scripts-custom.zip $CUSTOM_SCRIPTS_PATH; fi
 # zip app scripts once, since files here seldom changes
 if ! [[ -f scripts-app.zip && $USE_APP = "yes" ]]; then zip -r scripts-app.zip scripts/app; fi
-# re-zip dev (custom) scripts everytime
-zip -r scripts-dev.zip scripts/dev
+# re-zip dev scripts everytime
+zip -r scripts-dev.zip $DEV_SCRIPTS_PATH
 
 # stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
 cat .gitignore proto.dockerignore >> .dockerignore
