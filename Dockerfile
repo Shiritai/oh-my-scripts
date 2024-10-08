@@ -29,13 +29,17 @@ RUN sudo chown -R ${USER} $HOME/scripts && \
 COPY scripts/run-with-utils.sh $HOME/scripts
 COPY scripts/unpack-and-install.sh $HOME/scripts
 
+# Install all plugins
+# The order is:
+#   [core] -> [common] -> [app] -> [custom] -> [dev]
+
 # Variables to config core plugins.
 # These variables will be read by setup scripts.
 ARG LOCALE="C.UTF-8"
 ARG TZ="Asia/Tokyo"
 ARG USE_SYSTEMD="yes"
 
-# Install common plugins
+# Install core plugins
 COPY scripts-core.zip $HOME
 RUN LOCALE=${LOCALE} \
     TZ=${TZ} \
@@ -62,8 +66,8 @@ RUN USE_SYSTEMD=${USE_SYSTEMD} \
     USE_GUI=${USE_GUI} \
     $HOME/scripts/unpack-and-install.sh common
 
-# Install app plugins, always copy zip file in
-# and always remove them regardless of installing them or not
+# Install app plugins, always copy zip file into the image
+# and remove them regardless of installing them or not
 ARG USE_APP=no
 COPY scripts-app.zip $HOME
 RUN ([ "${USE_APP}" = "yes" ] && \
