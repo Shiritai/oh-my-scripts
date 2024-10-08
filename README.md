@@ -85,6 +85,7 @@ USE_GPU=${USE_GPU:-no} # yes or no
 ### 使用者相關
 
 |功能|旗標|預設值|備注|
+|:-:|:-:|:-:|:-:|
 |user name|`USERNAME`|as current user||
 |user password|`USE_USER_PSWD`|no|`USER_PSWD` default to `CHANGE_ME`|
 
