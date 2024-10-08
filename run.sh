@@ -48,7 +48,10 @@ USE_APP=${USE_APP:-no} # yes or no
 USE_MOUNT_DIR=${USE_MOUNT_DIR:-no} # yes or no, no means do not mount volume
 MOUNT_DIR=${MOUNT_DIR:-"$SCRIPT_DIR/data"}
 
-# Script path related settings
+# ----------- [Path related Parameters] -----------
+
+# Directory of this script, a.k.a. `oh-my-scripts`
+SCRIPT_DIR=$(realpath $(dirname $0))
 
 # `custom`
 DEFAULT_CUSTOM_SCRIPTS_PATH=$SCRIPT_DIR/scripts/custom
@@ -67,9 +70,6 @@ DEV_SCRIPTS_PATH=${DEV_SCRIPTS_PATH:-$DEFAULT_DEV_SCRIPTS_PATH}
 OMS_MODE=${OMS_MODE:-br}
 
 # ----------- [Execution Part] -----------
-
-# Directory of this script, a.k.a. `oh-my-scripts`
-SCRIPT_DIR=$(realpath $(dirname $0))
 
 get_absolute_path_if_is_relative() {
     if [[ "$1" = /* ]]; then # absolute, do nothing
@@ -99,6 +99,8 @@ cd $SCRIPT_DIR
 # stack 2: zip scripts to a single file for image building
 # zip util scripts once, since files here seldom changes
 if ! [[ -f scripts-utils.zip ]]; then zip -r scripts-utils.zip scripts/utils; fi
+# zip core scripts once, since files here seldom changes
+if ! [[ -f scripts-core.zip ]]; then zip -r scripts-core.zip scripts/core; fi
 # zip common scripts once, since files here seldom changes
 if ! [[ -f scripts-common.zip ]]; then zip -r scripts-common.zip scripts/common; fi
 # zip custom scripts once, since files here seldom changes
@@ -144,8 +146,8 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_MOUNT_DIR = yes ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
                     $([[ $USE_GPU = yes ]] && echo "--gpus all") \
                     $([[ $USE_SYSTEMD = yes ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
-                                                          --cap-add SYS_BOOT --cap-add SYS_ADMIN
-                                                          --cgroupns host -v /sys/fs/cgroup:/sys/fs/cgroup") \
+                                                        --cap-add SYS_BOOT --cap-add SYS_ADMIN
+                                                        --cgroupns host -v /sys/fs/cgroup:/sys/fs/cgroup") \
                     $([[ $USE_VNC = yes && $VNC_PORT != none ]] && echo "-p $VNC_PORT:5901") \
                     $([[ $USE_NO_VNC = yes && $NO_VNC_PORT != none ]] && echo "-p $NO_VNC_PORT:6901") \
                     $([[ $USE_SSH = yes ]] && echo "-p $SSH_PORT:22") \

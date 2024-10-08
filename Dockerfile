@@ -5,27 +5,6 @@ ENV container=docker
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE DontWarn
 ENV DEBIAN_FRONTEND noninteractive
 
-ARG LOCALE="C.UTF-8"
-ARG TZ="Asia/Tokyo"
-
-# Set locale and timezone
-RUN echo -e "[\e[1;34mINFO\e[0m] Setup locale to ${LOCALE} and timezone to ${TZ}" && \
-    apt-get update -qq && \
-    apt-get install -y -qq --no-install-recommends locales > /dev/null && \
-    echo "$LOCALE UTF-8" >> /etc/locale.gen && \
-    locale-gen && \
-    ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
-    echo ${TZ} > /etc/timezone && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install systemd
-ARG USE_SYSTEMD="yes"
-RUN ([ ${USE_SYSTEMD} = yes ] && \
-    echo -e "[\e[1;34mINFO\e[0m] Use systemd" && \
-    apt-get update -qq -y && \
-    apt-get install -qq -y dbus dbus-x11 systemd > /dev/null) || true
-
 # Setup user, after sudo user created and set,
 # the commands that needs root priviledge needs "sudo"
 ARG USER="user"
@@ -33,7 +12,6 @@ ARG HOME="/home/$USER"
 ENV USER "${USER}"
 RUN echo -e "[\e[1;34mINFO\e[0m] Setup user $USER" && \
     apt-get update -qq -y && \
-    apt-get upgrade -qq -y && \
     apt-get install -qq -y sudo unzip && \
     useradd -m -G sudo "${USER}" && \
     echo "${USER} ALL = NOPASSWD: ALL" > /etc/sudoers.d/"${USER}" && \
@@ -49,62 +27,56 @@ RUN sudo chown -R ${USER} $HOME/scripts && \
     sudo unzip $HOME/scripts-utils.zip -d $HOME && \
     rm $HOME/scripts-utils.zip
 COPY scripts/run-with-utils.sh $HOME/scripts
+COPY scripts/unpack-and-install.sh $HOME/scripts
 
-# Environment variables to decide which package to be installed.
-# These environment variable will be read by setup scripts.
+# Variables to config core plugins.
+# These variables will be read by setup scripts.
+ARG LOCALE="C.UTF-8"
+ARG TZ="Asia/Tokyo"
+ARG USE_SYSTEMD="yes"
+
+# Install common plugins
+COPY scripts-core.zip $HOME
+RUN LOCALE=${LOCALE} \
+    TZ=${TZ} \
+    USE_SYSTEMD=${USE_SYSTEMD} \
+    $HOME/scripts/unpack-and-install.sh core
+
+# Variables to decide which package to be installed.
+# These variables will be read by setup scripts.
 ARG USE_SSH=no
-ENV USE_SSH "${USE_SSH}"
-
 ARG USE_VNC=no
-ENV USE_VNC "${USE_VNC}"
-
-ARG USE_NO_VNC=no
-ENV USE_NO_VNC "${USE_NO_VNC}"
-
 ARG VNC_PSWD="vncpswd"
-ENV VNC_PSWD "${VNC_PSWD}"
-
+ARG USE_NO_VNC=no
 ARG USE_OMZ=no
-ENV USE_OMZ "${USE_OMZ}"
-
 ARG USE_GUI=no
-ENV USE_GUI "${USE_GUI}"
 
 # Install common plugins
 COPY scripts-common.zip $HOME
-RUN sudo chown -R ${USER} $HOME/scripts && \
-    sudo unzip $HOME/scripts-common.zip -d $HOME && \
-    rm $HOME/scripts-common.zip && \
-    $HOME/scripts/run-with-utils.sh \
-    setup_all_plugins_in $HOME/scripts/common
+RUN USE_SYSTEMD=${USE_SYSTEMD} \
+    USE_SSH=${USE_SSH} \
+    USE_VNC=${USE_VNC} \
+    VNC_PSWD=${VNC_PSWD} \
+    USE_NO_VNC=${USE_NO_VNC} \
+    USE_OMZ=${USE_OMZ} \
+    USE_GUI=${USE_GUI} \
+    $HOME/scripts/unpack-and-install.sh common
 
 # Install app plugins, always copy zip file in
 # and always remove them regardless of installing them or not
 ARG USE_APP=no
 COPY scripts-app.zip $HOME
 RUN ([ "${USE_APP}" = "yes" ] && \
-    sudo chown -R ${USER} $HOME/scripts && \
-    sudo unzip $HOME/scripts-app.zip -d $HOME && \
-    rm $HOME/scripts-app.zip && \
-    $HOME/scripts/run-with-utils.sh \
-    setup_all_plugins_in $HOME/scripts/app) || \
+    $HOME/scripts/unpack-and-install.sh app) || \
     rm $HOME/scripts-app.zip
 
 # Install custom plugins
 COPY scripts-custom.zip $HOME
-RUN sudo chown -R ${USER} $HOME/scripts && \
-    sudo unzip $HOME/scripts-custom.zip -d $HOME && \
-    rm $HOME/scripts-custom.zip && \
-    $HOME/scripts/run-with-utils.sh \
-    setup_all_plugins_in $HOME/scripts/custom
+RUN $HOME/scripts/unpack-and-install.sh custom
 
 # Install dev plugins
 COPY scripts-dev.zip $HOME
-RUN sudo chown -R ${USER} $HOME/scripts && \
-    sudo unzip $HOME/scripts-dev.zip -d $HOME && \
-    rm $HOME/scripts-dev.zip && \
-    $HOME/scripts/run-with-utils.sh \
-    setup_all_plugins_in $HOME/scripts/dev
+RUN $HOME/scripts/unpack-and-install.sh dev
 
 # set user password
 ARG USER_PSWD="CHANGE_ME"

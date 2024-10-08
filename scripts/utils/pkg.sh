@@ -14,6 +14,8 @@ install_if_dne() {
             print_info "$item DNE, install it..."
             sudo apt-get install -qq -y $item > /dev/null
             print_info "$item installed successfully"
+        else
+            print_info "$item exists, skip installation"
         fi
     done
     if [ $_UPDATED = "yes" ]; then
@@ -22,4 +24,17 @@ install_if_dne() {
         sudo apt-get clean
         sudo rm -rf /var/lib/apt/lists/*
     fi
+}
+
+remove_if_exist() {
+    for item in "$@"; do
+        if ! [[ -z $(sudo apt -qq list $item --installed 2>/dev/null) ]]
+        then
+            print_info "$item exist, uninstall it..."
+            sudo apt-get purge -qq -y --autoremove $item > /dev/null
+            print_info "$item uninstalled successfully"
+        else
+            print_info "$item DNE, skip uninstallation"
+        fi
+    done
 }
