@@ -82,26 +82,25 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 目前支援下列功能。
 
-### 核心功能 Core features in `Dockerfile`
-
-> TODO: 可將其獨立成腳本
-
-核心功能部分可選，皆可客製化。
-
+### 使用者相關
 
 |功能|旗標|預設值|備注|
-|:-:|:-:|:-:|:-:|
-|locale|`LOCALE`|as host||
-|timezone|`TZ`|as host||
-|systemd|`USE_SYSTEMD`|yes||
 |user name|`USERNAME`|as current user||
 |user password|`USE_USER_PSWD`|no|`USER_PSWD` default to `CHANGE_ME`|
+
+### 核心功能 `core`
+
+|功能|旗標|預設值|
+|:-:|:-:|:-:|
+|locale|`LOCALE`|as host|
+|timezone|`TZ`|as host|
+|systemd|`USE_SYSTEMD`|yes|
 
 ### 基本功能 `common`
 
 基本功能全部可選，預設皆為不使用，以 `USE_` 為前綴的參數預設皆為 `no`。
 
-|功能|旗標|可選項|可選值|
+|功能|旗標|可選項|可選項預設值|
 |:-:|:-:|:-:|:-:|
 |ssh|`USE_SSH`|`SSH_PORT`|22|
 |vnc|`USE_VNC`|`VNC_PORT`|5901|
