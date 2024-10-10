@@ -34,7 +34,7 @@ sudo openssl req -new \
 cd utils
 sudo git clone https://github.com/novnc/websockify
 
-if [ ${USE_SYSTEMD} = yes ]; then
+if [[ ${USE_SYSTEMD} = yes ]]; then
     echo "[Unit]
 Description=noVNC remote desktop server
 After=tigervnc@:1.service

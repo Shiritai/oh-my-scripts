@@ -8,7 +8,7 @@ if ! [ $USE_VNC = "yes" ]; then
     exit 0
 fi
 
-print_info "noVNC service is needed, preparing vnc server..."
+print_info "VNC service is needed, preparing vnc server..."
 
 # Note: the length of password longer then 8
 #       will be truncated to the length of 8

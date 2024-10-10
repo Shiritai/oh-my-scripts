@@ -20,7 +20,7 @@ check_or_install_omz() {
     fi
 
     # setup oh-my-zsh environment and plugins
-    _ZSH_CUSTOM=${ZSH:-~/.oh-my-zsh}/custom
+    local _ZSH_CUSTOM=${ZSH:-~/.oh-my-zsh}/custom
     if [ ! -d ${_ZSH_CUSTOM}/plugins ]
     then
         print_info "Omz directory DNE, installing oh-my-zsh and corresponding plugins"
@@ -28,17 +28,21 @@ check_or_install_omz() {
     fi
 
     # check existence of all themes and plugins, download if DNE
-    tars=( "${_ZSH_CUSTOM}/plugins/zsh-completions" "${_ZSH_CUSTOM}/plugins/zsh-autosuggestions" "${_ZSH_CUSTOM}/plugins/zsh-syntax-highlighting" "${_ZSH_CUSTOM}/themes/powerlevel10k" )
-    links=( zsh-users/zsh-completions zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting romkatv/powerlevel10k )
+    local tars=( "${_ZSH_CUSTOM}/plugins/zsh-completions" "${_ZSH_CUSTOM}/plugins/zsh-autosuggestions" "${_ZSH_CUSTOM}/plugins/zsh-syntax-highlighting" "${_ZSH_CUSTOM}/themes/powerlevel10k" )
+    local links=( zsh-users/zsh-completions zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting romkatv/powerlevel10k )
     for i in "${!tars[@]}"; do
         print_info "Checking ${tars[$i]}..."
-        if [ ! -d ${tars[$i]} ] ; then git clone https://github.com/${links[$i]} ${tars[$i]} ; fi
+        if [ ! -d ${tars[$i]} ] ; then
+            git clone https://github.com/${links[$i]} ${tars[$i]}
+        fi
     done
 
     # download and install meslo nerd font
     links=( MesloLGS%20NF%20Regular.ttf MesloLGS%20NF%20Bold.ttf MesloLGS%20NF%20Italic.ttf MesloLGS%20NF%20Bold%20Italic.ttf )
     for i in "${!links[@]}"; do
-        sudo wget -P /usr/local/share/fonts "https://github.com/romkatv/powerlevel10k-media/raw/master/${links[$i]}" > /dev/null 2>&1
+        sudo wget -P /usr/local/share/fonts \
+            "https://github.com/romkatv/powerlevel10k-media/raw/master/${links[$i]}" \
+            > /dev/null 2>&1
     done
     fc-cache -fv > /dev/null
 }
