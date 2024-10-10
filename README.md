@@ -23,6 +23,13 @@ The scripting tool for container environment build-up development. OH MY SCRIPTS
   * 能更細緻的指定要使用哪些外掛
   * 實作一個小型套件管理器 ?!
   * 為外掛建立 Dependency DAG
+* 新 `common` plugins
+  * `audio` 使 noVNC 能支援音訊傳輸
+  * `wine` 使容器支援運行 windows 相容程式
+* 支援更多 Linux distributions
+  * Ubuntu (current)
+  * Arch Linux
+  * Alpine Linux
 
 ## 用法 Usage
 
