@@ -48,6 +48,12 @@ USE_APP=${USE_APP:-no} # yes or no
 USE_MOUNT_DIR=${USE_MOUNT_DIR:-no} # yes or no, no means do not mount volume
 MOUNT_DIR=${MOUNT_DIR:-"$SCRIPT_DIR/data"}
 
+# Additional arguments to feed to docker build
+DOCKER_BUILD_ARGS=${DOCKER_BUILD_ARGS:-""}
+
+# Additional arguments to feed to docker run
+DOCKER_RUN_ARGS=${DOCKER_RUN_ARGS:-""}
+
 # ----------- [Path related Parameters] -----------
 
 # Directory of this script, a.k.a. `oh-my-scripts`
@@ -140,6 +146,7 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg USE_APP="${USE_APP}" \
                       --build-arg USE_USER_PSWD="${USE_USER_PSWD}" \
                       --build-arg USER_PSWD="${USER_PSWD}" \
+                      $(! [[ -z ${DOCKER_BUILD_ARGS} ]] && echo "--build-arg ${DOCKER_BUILD_ARGS}") \
                       . 2>&1 | tee build.log
 fi
 
@@ -160,6 +167,7 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_VNC = yes && $VNC_PORT != none ]] && echo "-p $VNC_PORT:5901") \
                     $([[ $USE_NO_VNC = yes && $NO_VNC_PORT != none ]] && echo "-p $NO_VNC_PORT:6901") \
                     $([[ $USE_SSH = yes ]] && echo "-p $SSH_PORT:22") \
+                    $(echo ${DOCKER_RUN_ARGS}) \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
                     ${IMG_NAME} $([[ $USE_SYSTEMD = yes ]] && echo "/sbin/init")
