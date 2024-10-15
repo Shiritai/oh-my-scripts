@@ -6,7 +6,7 @@
 __PKG__=$1
 
 sudo chown -R ${USER} $HOME/scripts
-sudo unzip $HOME/scripts-${__PKG__}.zip -d $HOME
+sudo unzip $HOME/scripts-${__PKG__}.zip -d $HOME/scripts/${__PKG__}
 rm $HOME/scripts-${__PKG__}.zip
 
 $HOME/scripts/run-with-utils.sh setup_all_plugins_in $HOME/scripts/${__PKG__}

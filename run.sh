@@ -96,19 +96,28 @@ MOUNT_DIR=$(get_absolute_path_if_is_relative $MOUNT_DIR)
 OLD_DIR=$pwd
 cd $SCRIPT_DIR
 
+# Extract directory $2 to zip file named $1
+dir_to_zip() {
+    local PATH_BEFORE_EXTRACT=$(pwd)
+    cd $2
+    zip -r $1 .
+    mv $1 ${PATH_BEFORE_EXTRACT}
+    cd ${PATH_BEFORE_EXTRACT}
+}
+
 # stack 2: zip scripts to a single file for image building
 # zip util scripts once, since files here seldom changes
-if ! [[ -f scripts-utils.zip ]]; then zip -r scripts-utils.zip scripts/utils; fi
+if ! [[ -f scripts-utils.zip ]]; then dir_to_zip scripts-utils.zip scripts/utils; fi
 # zip core scripts once, since files here seldom changes
-if ! [[ -f scripts-core.zip ]]; then zip -r scripts-core.zip scripts/core; fi
+if ! [[ -f scripts-core.zip ]]; then dir_to_zip scripts-core.zip scripts/core; fi
 # zip common scripts once, since files here seldom changes
-if ! [[ -f scripts-common.zip ]]; then zip -r scripts-common.zip scripts/common; fi
+if ! [[ -f scripts-common.zip ]]; then dir_to_zip scripts-common.zip scripts/common; fi
 # zip custom scripts once, since files here seldom changes
-if ! [[ -f scripts-custom.zip ]]; then zip -r scripts-custom.zip $CUSTOM_SCRIPTS_PATH; fi
+if ! [[ -f scripts-custom.zip ]]; then dir_to_zip scripts-custom.zip $CUSTOM_SCRIPTS_PATH; fi
 # zip app scripts once, since files here seldom changes
-if ! [[ -f scripts-app.zip && $USE_APP = "yes" ]]; then zip -r scripts-app.zip scripts/app; fi
+if ! [[ -f scripts-app.zip && $USE_APP = "yes" ]]; then dir_to_zip scripts-app.zip scripts/app; fi
 # re-zip dev scripts everytime
-zip -r scripts-dev.zip $DEV_SCRIPTS_PATH
+dir_to_zip scripts-dev.zip $DEV_SCRIPTS_PATH
 
 # stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
 cat .gitignore proto.dockerignore >> .dockerignore

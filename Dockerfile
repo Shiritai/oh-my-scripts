@@ -24,7 +24,7 @@ USER "${USER}"
 # copy scripts to container
 COPY scripts-utils.zip $HOME
 RUN sudo chown -R ${USER} $HOME/scripts && \
-    sudo unzip $HOME/scripts-utils.zip -d $HOME && \
+    sudo unzip $HOME/scripts-utils.zip -d $HOME/scripts/utils && \
     rm $HOME/scripts-utils.zip
 COPY scripts/run-with-utils.sh $HOME/scripts
 COPY scripts/unpack-and-install.sh $HOME/scripts
