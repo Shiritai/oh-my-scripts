@@ -7,14 +7,14 @@
 BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
 IMG_NAME=${IMG_NAME:-oh-my-c}
 
-LOCALE=${LOCALE:-$(locale -a | grep -v C | grep -v POSIX | head -n 1)}
-TZ=${TZ:-$(timedatectl show | grep -E "Timezone=" | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+")}
+LOCALE=${LOCALE:-$((locale -a | grep -v C | grep -v POSIX | head -n 1) || echo "")}
+TZ=${TZ:-$((timedatectl show | grep -E "Timezone=" | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+") > /dev/null 2>&1 || echo "")}
 
 # Systemd support
 USE_SYSTEMD=${USE_SYSTEMD:-yes} # yes or no
 
 USERNAME=${USERNAME:-$USER} # Username of the container
-# Feel free to change user password if needed
+# Change user password if needed
 USE_USER_PSWD=${USE_USER_PSWD:-"no"}
 USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
 

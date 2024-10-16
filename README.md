@@ -8,29 +8,6 @@ The scripting tool for container environment build-up development. OH MY SCRIPTS
 
 有沒有方法能打破現狀呢？有沒有個工具可以大幅加速容器的開發？能提供開發者一套現成且易於重用的環境模板庫，讓開發者能更大限度地享受容器所帶來的優勢？這便是 `oh-my-scripts` 的目標。
 
-## 未來目標 Roadmap
-
-### 開發輔助 Dev tools
-
-* **建立測試框架**
-* 容器運行後執行之命令的自動記錄 (命令 - 結果)，並進一步自動腳本化
-* 容器的建構平行化: 支援同時建立多個容器，其建構時的的差異只有一小部分，對這些差異和對應的容器建立 pair 來追蹤，方便開發者快速嘗試多種 build 的 image
-
-### 客製化輔助 Customize tools
-
-* 將參數指派做成互動式 / 非互動式的設定檔
-* 提供更靈活的容器外掛設定
-  * 能更細緻的指定要使用哪些外掛
-  * 實作一個小型套件管理器 ?!
-  * 為外掛建立 Dependency DAG
-* 新 `common` plugins
-  * `audio` 使 noVNC 能支援音訊傳輸
-  * `wine` 使容器支援運行 windows 相容程式
-* 支援更多 Linux distributions
-  * Ubuntu (current)
-  * Arch Linux
-  * Alpine Linux
-
 ## 用法 Usage
 
 ### 介紹 Introduction
@@ -80,6 +57,8 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 請將客製化腳本放在 `scripts/custom` 或 `scripts/dev` 中:
 
+> 外掛即含有 `setup.sh` 的資料夾，可參見 `custom` 和 `dev` 底下的 `README.md`。
+
 * `scripts/custom`: 放入您已經開發好的，穩定的外掛
 * `scripts/dev`: 放入您正在開發的，不穩定的外掛
 
@@ -91,24 +70,24 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 ### 使用者相關
 
-|功能|旗標|預設值|備注|
+|功能|參數|預設值|備注|
 |:-:|:-:|:-:|:-:|
 |user name|`USERNAME`|as current user||
 |user password|`USE_USER_PSWD`|no|`USER_PSWD` default to `CHANGE_ME`|
 
 ### 核心功能 `core`
 
-|功能|旗標|預設值|
+|功能|參數|預設值|
 |:-:|:-:|:-:|
-|locale|`LOCALE`|as host|
-|timezone|`TZ`|as host|
+|locale|`LOCALE`|as host<br>(detect using `locale`)|
+|timezone|`TZ`|as host<br>(detect using `timedatectl`)|
 |systemd|`USE_SYSTEMD`|yes|
 
 ### 基本功能 `common`
 
 基本功能全部可選，預設皆為不使用，以 `USE_` 為前綴的參數預設皆為 `no`。
 
-|功能|旗標|可選項|可選項預設值|
+|功能|參數|可選項|可選項預設值|
 |:-:|:-:|:-:|:-:|
 |ssh|`USE_SSH`|`SSH_PORT`|22|
 |vnc|`USE_VNC`|`VNC_PORT`|5901|
@@ -126,3 +105,26 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 * Firefox: Linux 上最好用的瀏覽器
 * vscode: 好用的 IDE
+
+## 未來目標 Roadmap
+
+### 開發輔助 Dev tools
+
+* **建立測試框架**
+* 容器運行後執行之命令的自動記錄 (命令 - 結果)，並進一步自動腳本化
+* 容器的建構平行化: 支援同時建立多個容器，其建構時的的差異只有一小部分，對這些差異和對應的容器建立 pair 來追蹤，方便開發者快速嘗試多種 build 的 image
+
+### 客製化輔助 Customize tools
+
+* 將參數指派做成互動式 / 非互動式的設定檔
+* 提供更靈活的容器外掛設定
+  * 能更細緻的指定要使用哪些外掛
+  * 實作一個小型套件管理器 ?!
+  * 為外掛建立 Dependency DAG
+* 新 `common` plugins
+  * `audio` 使 noVNC 能支援音訊傳輸
+  * `wine` 使容器支援運行 windows 相容程式
+* 支援更多 Linux distributions
+  * Ubuntu (current)
+  * Arch Linux (support)
+  * Alpine Linux
