@@ -88,7 +88,7 @@ ARG USE_USER_PSWD="no"
 RUN ([ $USE_USER_PSWD = yes ] && \
     echo "${USER}:${USER_PSWD}" | sudo chpasswd) || true
 
-# Switch back to root to start systemd (when USE_SYSTEMD is set)
+# Switch back to root to start systemd (in case that USE_SYSTEMD is set)
 USER root
 
 # Remove unnecessary system targets

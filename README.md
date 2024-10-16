@@ -52,6 +52,8 @@ USE_GPU=${USE_GPU:-no} # yes or no
   * `docker build`
   * 刪除產生的 `.dockerignore` 和 `scripts-dev.zip`
 * if `docker run` is needed, run it
+  * Plugins will be installed with the following order
+    * `core` -> `common` -> `app` -> `custom` -> `dev`
 
 ### Add you own plugins
 
@@ -93,7 +95,7 @@ All basic features are optional and disabled by default. Parameters prefixed wit
 |vnc|`USE_VNC`|`VNC_PORT`|5901|
 |||`VNC_PSWD`|`vncpswd`|
 |noVNC|`USE_NO_VNC`|`NO_VNC_PORT`|6901|
-|zsh + oh-my-zsh|`USE_OMZ`|||
+|zsh + oh-my-zsh|`USE_OMZ`|Please provide your `.zshrc`<br>and other zsh related dotfiles<br>and put them into `common/omz`|Dotfiles prefixed with<br>`example` in `common/omz`|
 |Nvidia GPU|`USE_GPU`|||
 |GUI (Gnome)|`USE_GUI`|||
 

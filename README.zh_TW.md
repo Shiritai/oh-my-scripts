@@ -43,14 +43,17 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 `run.sh` 會依序:
 
-* 準備 build 參數
-* 將 `scripts/<DIR>` 壓縮成 `scripts-<DIR>.zip`
-  * `utils`, `common`, `custom` 和 `app` 只會在壓縮檔不存在時壓縮，因假設這裡面的資料不太會變動。若有變動，請刪掉壓縮檔，可使用 `clean.sh` 刪除所有 `scripts-*` 壓縮檔。
-  * `dev` 每次需要 `build` 時都會重新壓縮，假設當中的檔案時常變動。
-* 產生 `.dockerignore`
-* `docker build`
-* 刪除產生的 `.dockerignore` 和 `scripts-dev.zip`
+* 如果需要 `docker build`
+  * 準備 build 參數
+  * 將 `scripts/<DIR>` 壓縮成 `scripts-<DIR>.zip`
+    * `utils`, `common`, `custom` 和 `app` 只會在壓縮檔不存在時壓縮，因假設這裡面的資料不太會變動。若有變動，請刪掉壓縮檔，可使用 `clean.sh` 刪除所有 `scripts-*` 壓縮檔。
+    * `dev` 每次需要 `build` 時都會重新壓縮，假設當中的檔案時常變動。
+  * 產生 `.dockerignore`
+  * `docker build`
+  * 刪除產生的 `.dockerignore` 和 `scripts-dev.zip`
 * `docker run`
+  * 外掛會依照以下順序安裝
+    * `core` -> `common` -> `app` -> `custom` -> `dev`
 
 ### 放入客製化外掛 Add you own plugins
 
@@ -92,7 +95,7 @@ USE_GPU=${USE_GPU:-no} # yes or no
 |vnc|`USE_VNC`|`VNC_PORT`|5901|
 |||`VNC_PSWD`|`vncpswd`|
 |noVNC|`USE_NO_VNC`|`NO_VNC_PORT`|6901|
-|zsh + oh-my-zsh|`USE_OMZ`|||
+|zsh + oh-my-zsh|`USE_OMZ`|Please provide your `.zshrc`<br>and other zsh related dotfiles<br>and put them into `common/omz`|Dotfiles prefixed with<br>`example` in `common/omz`|
 |Nvidia GPU|`USE_GPU`|||
 |GUI (Gnome)|`USE_GUI`|||
 
