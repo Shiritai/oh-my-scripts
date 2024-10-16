@@ -111,24 +111,24 @@ dir_to_zip() {
     cd ${PATH_BEFORE_EXTRACT}
 }
 
-# stack 2: zip scripts to a single file for image building
-# zip util scripts once, since files here seldom changes
-if ! [[ -f scripts-utils.zip ]]; then dir_to_zip scripts-utils.zip scripts/utils; fi
-# zip core scripts once, since files here seldom changes
-if ! [[ -f scripts-core.zip ]]; then dir_to_zip scripts-core.zip scripts/core; fi
-# zip common scripts once, since files here seldom changes
-if ! [[ -f scripts-common.zip ]]; then dir_to_zip scripts-common.zip scripts/common; fi
-# zip custom scripts once, since files here seldom changes
-if ! [[ -f scripts-custom.zip ]]; then dir_to_zip scripts-custom.zip $CUSTOM_SCRIPTS_PATH; fi
-# zip app scripts once, since files here seldom changes
-if ! [[ -f scripts-app.zip && $USE_APP = "yes" ]]; then dir_to_zip scripts-app.zip scripts/app; fi
-# re-zip dev scripts everytime
-dir_to_zip scripts-dev.zip $DEV_SCRIPTS_PATH
-
-# stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
-cat .gitignore proto.dockerignore >> .dockerignore
-
 if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
+    # stack 2: zip scripts to a single file for image building
+    # zip util scripts once, since files here seldom changes
+    if ! [[ -f scripts-utils.zip ]]; then dir_to_zip scripts-utils.zip scripts/utils; fi
+    # zip core scripts once, since files here seldom changes
+    if ! [[ -f scripts-core.zip ]]; then dir_to_zip scripts-core.zip scripts/core; fi
+    # zip common scripts once, since files here seldom changes
+    if ! [[ -f scripts-common.zip ]]; then dir_to_zip scripts-common.zip scripts/common; fi
+    # zip custom scripts once, since files here seldom changes
+    if ! [[ -f scripts-custom.zip ]]; then dir_to_zip scripts-custom.zip $CUSTOM_SCRIPTS_PATH; fi
+    # zip app scripts once, since files here seldom changes
+    if ! [[ -f scripts-app.zip && $USE_APP = "yes" ]]; then dir_to_zip scripts-app.zip scripts/app; fi
+    # re-zip dev scripts everytime
+    dir_to_zip scripts-dev.zip $DEV_SCRIPTS_PATH
+
+    # stack 3: generate .dockerignore from docker-proto-ignore and .gitignore
+    cat .gitignore proto.dockerignore >> .dockerignore
+
     # build docker image
     sudo docker build -t $IMG_NAME \
                       --platform linux/amd64 \
@@ -148,13 +148,13 @@ if [[ $OMS_MODE = "b" || $OMS_MODE = "br" ]]; then
                       --build-arg USER_PSWD="${USER_PSWD}" \
                       $(! [[ -z ${DOCKER_BUILD_ARGS} ]] && echo "--build-arg ${DOCKER_BUILD_ARGS}") \
                       . 2>&1 | tee build.log
+
+    # stack 3: remove temporary .dockerignore
+    rm .dockerignore
+
+    # stack 2: remove generated zip file
+    rm scripts-dev.zip
 fi
-
-# stack 3: remove temporary .dockerignore
-rm .dockerignore
-
-# stack 2: remove generated zip file
-rm scripts-dev.zip
 
 if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
     # run container
