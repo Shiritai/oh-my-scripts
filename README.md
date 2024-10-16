@@ -2,21 +2,21 @@
 
 The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
 
-容器化 (Containerization) 是個好東西，它使快速建立、消除、移植相同環境等任務有著遠超於虛擬機的表現，使我們幾乎一瞬間就能利用他人建構好的 image 快速部署服務。
+For (Traditional) Chinese document, please check [this document](./README.zh_TW.md).
 
-話雖如此，作為提供服務的開發者，即建構某服務或某環境對應之開箱即用容器的開發者而言，撰寫 `Dockerfile` 與腳本，將其 `docker build` 後 `docker run` 來驗證結果，再修改 `Dockerfile` 重複前述過程的循環仍然是個冗長費神且不優雅的過程。
+Containerization is a great technology. It allows tasks such as building, removing, and migrating identical environments to perform far faster than virtual machines. With it, we can almost instantly deploy services using pre-built images by others.
 
-有沒有方法能打破現狀呢？有沒有個工具可以大幅加速容器的開發？能提供開發者一套現成且易於重用的環境模板庫，讓開發者能更大限度地享受容器所帶來的優勢？這便是 `oh-my-scripts` 的目標。
+That being said, for developers providing services, those who build a service or a corresponding ready-to-use container environment, writing a Dockerfile and scripts, followed by `docker build` and then `docker run` to verify the results, and then modifying the `Dockerfile` and repeating the process, is still a tedious, time-consuming, and inelegant.
 
-## 用法 Usage
+Is there a way to break the status quo? Is there a tool that can greatly accelerate container development? One that can provide developers with a ready-to-use and easily reusable library of environment templates, allowing them to maximize the advantages of containers? This is the goal of `oh-my-scripts`.
 
-### 介紹 Introduction
+## Usage
 
-執行 `run.sh`。
+### Introduction
 
-其有許多參數，可參閱 `run.sh` 前半部 `Customizable Parameters` 做變數的設定。
+Run `run.sh`。
 
-(TODO: 非設定命令行參數的的參數化)
+It has many parameters. You can refer to the first half of `run.sh` under the section `Customizable Parameters` for variable settings.
 
 ```bash
 # ----------- [Customizable Parameters] -----------
@@ -41,53 +41,53 @@ USE_GPU=${USE_GPU:-no} # yes or no
 # ----------- [Execution Part] -----------
 ```
 
-`run.sh` 會依序:
+`run.sh` will:
 
-* 準備 build 參數
-* (Optional, 當 `CUSTOM_SCRIPTS_PATH` 被設定時) 將客製化腳本目錄內的腳本複製進本 repo
-* 將 `scripts/<DIR>` 壓縮成 `scripts-<DIR>.zip`
-  * `utils`, `common`, `custom` 和 `app` 只會在壓縮檔不存在時壓縮，因假設這裡面的資料不太會變動。若有變動，請刪掉壓縮檔，可使用 `clear.sh` 刪除所有 `scripts-*` 壓縮檔。
-  * `dev` 每次都會重新壓縮，假設當中的檔案時常變動。
-* 產生 `.dockerignore`
-* `docker build`
-* 刪除產生的 `.dockerignore` 和 `scripts-dev.zip`
-* `docker run`
+* If `docker build` is needed
+  * Prepare building arguments
+  * Zip `scripts/<DIR>` to `scripts-<DIR>.zip`
+    * `utils`, `common`, `custom` and `app` will only be zipped when the corresponding zip file does not present. If there is any change to these part, please delete the corresponding zip file or run `clean.sh` to remove them.
+    * `dev` will re-zip anytime, files inside it are considered to be changed frequently
+  * Generate `.dockerignore`
+  * `docker build`
+  * 刪除產生的 `.dockerignore` 和 `scripts-dev.zip`
+* if `docker run` is needed, run it
 
-### 放入客製化外掛 Add you own plugins
+### Add you own plugins
 
-請將客製化腳本放在 `scripts/custom` 或 `scripts/dev` 中:
+Please put your plugin scripts to `scripts/custom` or `scripts/dev`.
 
-> 外掛即含有 `setup.sh` 的資料夾，可參見 `custom` 和 `dev` 底下的 `README.md`。
+> Def of plugin: directory in which `setup.sh` presents, see `README.md` in `custom` or `dev` for more info.
 
-* `scripts/custom`: 放入您已經開發好的，穩定的外掛
-* `scripts/dev`: 放入您正在開發的，不穩定的外掛
+* `scripts/custom`: stable container plugins
+* `scripts/dev`: unstable container plugins
 
-當您確認 `scripts/dev` 的某個外掛能穩定運作，可以將其移入 `scripts/custom`，如果已經執行過 `run.sh`，此時請刪除產生的 `scripts-custom.zip`。
+When some plugin in `scripts/dev` is tested to be stable, feel free to put them into `scripts/custom` and remove generated `scripts-custom.zip`.
 
-## 功能 Features
+## Features
 
-目前支援下列功能。
+Currently, the following features are supported.
 
-### 使用者相關
+### User related
 
-|功能|參數|預設值|備注|
+|Features|Argument|Default|p.s.|
 |:-:|:-:|:-:|:-:|
 |user name|`USERNAME`|as current user||
 |user password|`USE_USER_PSWD`|no|`USER_PSWD` default to `CHANGE_ME`|
 
-### 核心功能 `core`
+### `core`
 
-|功能|參數|預設值|
+|Features|Argument|Default|
 |:-:|:-:|:-:|
 |locale|`LOCALE`|as host<br>(detect using `locale`)|
 |timezone|`TZ`|as host<br>(detect using `timedatectl`)|
 |systemd|`USE_SYSTEMD`|yes|
 
-### 基本功能 `common`
+### `common`
 
-基本功能全部可選，預設皆為不使用，以 `USE_` 為前綴的參數預設皆為 `no`。
+All basic features are optional and disabled by default. Parameters prefixed with `USE_` are set to `no` by default.
 
-|功能|參數|可選項|可選項預設值|
+|Features|Argument|optional argument|default value of<br>optional argument|
 |:-:|:-:|:-:|:-:|
 |ssh|`USE_SSH`|`SSH_PORT`|22|
 |vnc|`USE_VNC`|`VNC_PORT`|5901|
@@ -97,34 +97,30 @@ USE_GPU=${USE_GPU:-no} # yes or no
 |Nvidia GPU|`USE_GPU`|||
 |GUI (Gnome)|`USE_GUI`|||
 
-### 應用程式 `app`
+### `app`
 
-將 `USE_APP` 設為 `yes` 來使用以下應用程式，預設不使用。
+Set `USE_APP` to `yes` to use the following applications, which are disabled (set to `no`) by default.
 
-若要使用這些軟體，建議將 `USE_GUI` 設為 `yes`，或提供 GUI 對應的腳本至 `custom` 或 `dev`
+If you want to use these software applications, it is recommended to set `USE_GUI` to `yes`, or provide the corresponding GUI scripts to the `custom` or `dev` directories.
 
-* Firefox: Linux 上最好用的瀏覽器
-* vscode: 好用的 IDE
+* Firefox: best browser on Linux
+* vscode: handy IDE
 
-## 未來目標 Roadmap
+## Roadmap
 
-### 開發輔助 Dev tools
+### Dev tools
 
-* **建立測試框架**
-* 容器運行後執行之命令的自動記錄 (命令 - 結果)，並進一步自動腳本化
-* 容器的建構平行化: 支援同時建立多個容器，其建構時的的差異只有一小部分，對這些差異和對應的容器建立 pair 來追蹤，方便開發者快速嘗試多種 build 的 image
+* **Establish a testing framework**
+* Automatically record the commands executed after the container is running (commands - results), and further automate the scripting process
+* Parallelize container building: support the simultaneous creation of multiple containers with only minor differences in their construction. Track these differences and their corresponding containers as pairs, making it easier for developers to quickly experiment with various built images.
 
-### 客製化輔助 Customize tools
+### Customize tools
 
-* 將參數指派做成互動式 / 非互動式的設定檔
-* 提供更靈活的容器外掛設定
-  * 能更細緻的指定要使用哪些外掛
-  * 實作一個小型套件管理器 ?!
-  * 為外掛建立 Dependency DAG
-* 新 `common` plugins
-  * `audio` 使 noVNC 能支援音訊傳輸
-  * `wine` 使容器支援運行 windows 相容程式
-* 支援更多 Linux distributions
+* Make parameter assignments into interactive/non-interactive configuration files
+* New `common` plugins
+  * `audio` to make noVNC supports audio streaming
+  * `wine` run windows compatible program
+* Support more Linux distributions
   * Ubuntu (current)
   * Arch Linux (support)
   * Alpine Linux
