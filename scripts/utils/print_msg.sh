@@ -5,13 +5,13 @@ print_info() {
 }
 
 print_warning() {
-    echo -e "[\e[1;33mINFO\e[0m] $@"
+    echo -e "[\e[1;33mWARN\e[0m] $@"
 }
 
-print_success() {
-    echo -e "[\e[1;32mINFO\e[0m] $@"
+print_debug() {
+    echo -e "[\e[1;32mDEBG\e[0m] $@"
 }
 
 print_failed() {
-    echo -e "[\e[1;31mINFO\e[0m] $@"
+    echo -e "[\e[1;31mFAIL\e[0m] $@"
 }
