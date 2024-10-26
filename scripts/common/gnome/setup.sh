@@ -14,4 +14,7 @@ install_if_dne gnome-session \
                nautilus
 
 remove_if_exist gnome-initial-setup
+
+# disable lockdown and idle timeout
 gsettings set org.gnome.desktop.screensaver lock-enabled false
+gsettings set org.gnome.desktop.session idle-delay 0
