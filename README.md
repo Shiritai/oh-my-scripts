@@ -50,7 +50,7 @@ USE_GPU=${USE_GPU:-no} # yes or no
     * `dev` will re-zip anytime, files inside it are considered to be changed frequently
   * Generate `.dockerignore`
   * `docker build`
-  * 刪除產生的 `.dockerignore` 和 `scripts-dev.zip`
+  * Remove generated `.dockerignore`, `scripts-dev.zip`
 * if `docker run` is needed, run it
   * Plugins will be installed with the following order
     * `core` -> `common` -> `app` -> `custom` -> `dev`
