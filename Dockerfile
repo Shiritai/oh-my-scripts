@@ -2,14 +2,13 @@ ARG BASE_IMG="ubuntu:20.04"
 FROM ${BASE_IMG}
 
 ENV container=docker
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE DontWarn
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Setup user, after sudo user created and set,
 # the commands that needs root priviledge needs "sudo"
 ARG USER="user"
 ARG HOME="/home/$USER"
-ENV USER "${USER}"
+ENV USER="${USER}"
 RUN echo -e "[\e[1;34mINFO\e[0m] Setup user $USER" && \
     apt-get update -qq -y && \
     apt-get install -qq -y sudo unzip && \
