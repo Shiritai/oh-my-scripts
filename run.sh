@@ -22,7 +22,7 @@ USE_GPU=${USE_GPU:-no} # yes or no
 
 USE_NO_VNC=${USE_NO_VNC:-no} # yes or no
 # port of host to open for noVNC
-NO_VNC_PORT=${NO_VNC_PORT:-6901}
+NO_VNC_PORT=${NO_VNC_PORT:-none}
 
 USE_VNC=${USE_VNC:-$(([ $USE_NO_VNC = yes ] && echo yes) || echo no)} # yes or no
 VNC_PSWD=${VNC_PSWD:-"vncpswd"}
@@ -32,7 +32,7 @@ VNC_PORT=${VNC_PORT:-none}
 
 USE_SSH=${USE_SSH:-no} # yes or no
 # port of host to open for ssh
-SSH_PORT=${SSH_PORT:-22}
+SSH_PORT=${SSH_PORT:-none}
 
 # use oh-my-zsh
 USE_OMZ=${USE_OMZ:-no} # yes or no
@@ -166,7 +166,7 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                                                         --cgroupns host -v /sys/fs/cgroup:/sys/fs/cgroup") \
                     $([[ $USE_VNC = yes && $VNC_PORT != none ]] && echo "-p $VNC_PORT:5901") \
                     $([[ $USE_NO_VNC = yes && $NO_VNC_PORT != none ]] && echo "-p $NO_VNC_PORT:6901") \
-                    $([[ $USE_SSH = yes ]] && echo "-p $SSH_PORT:22") \
+                    $([[ $USE_SSH = yes && $SSH_PORT != none ]] && echo "-p $SSH_PORT:22") \
                     $(echo ${DOCKER_RUN_ARGS}) \
                     -h ${IMG_NAME} \
                     --name ${IMG_NAME} \
