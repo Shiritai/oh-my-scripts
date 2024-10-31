@@ -6,6 +6,7 @@
 
 BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
 IMG_NAME=${IMG_NAME:-oh-my-c}
+CONTAINER_NAME=${CONTAINER_NAME:-IMG_NAME}
 
 LOCALE=${LOCALE:-$((locale -a | grep -v C | grep -v POSIX | head -n 1) || echo "")}
 TZ=${TZ:-$((timedatectl show | grep -E "Timezone=" | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+") > /dev/null 2>&1 || echo "")}
@@ -168,8 +169,8 @@ if [[ $OMS_MODE = "r" || $OMS_MODE = "br" ]]; then
                     $([[ $USE_NO_VNC = yes && $NO_VNC_PORT != none ]] && echo "-p $NO_VNC_PORT:6901") \
                     $([[ $USE_SSH = yes ]] && echo "-p $SSH_PORT:22") \
                     $(echo ${DOCKER_RUN_ARGS}) \
-                    -h ${IMG_NAME} \
-                    --name ${IMG_NAME} \
+                    -h ${CONTAINER_NAME} \
+                    --name ${CONTAINER_NAME} \
                     ${IMG_NAME} $([[ $USE_SYSTEMD = yes ]] && echo "/sbin/init")
 fi
 
