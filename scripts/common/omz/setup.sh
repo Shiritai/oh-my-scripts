@@ -59,7 +59,7 @@ check_or_setup_scripts() {
     done
 }
 
-install_if_dne vim unzip zsh git curl wget fontconfig
+install_if_dne unzip zsh git curl wget fontconfig
 check_or_install_omz
 check_or_setup_scripts
 
