@@ -14,9 +14,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # User test
+    # User test, we need at least one systemd
+    # related process to prevent container stop
+    # as the result, USE_SSH is assigned
     - name: Build image
-      run: OMS_MODE=br IMG_NAME=oms-core USERNAME=meow ${{ github.workspace }}/run.sh
+      run: OMS_MODE=br IMG_NAME=oms-core USE_SSH=yes USERNAME=meow ${{ github.workspace }}/run.sh
       
     - name: Test username
       run: docker exec oms-core runuser -u meow -- [[ $(whoami) = meow ]] && echo 'User us customizable'
