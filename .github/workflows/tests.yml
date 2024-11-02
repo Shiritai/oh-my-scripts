@@ -18,18 +18,24 @@ jobs:
     # related process to prevent container stop
     # as the result, USE_SSH is assigned
     - name: Build image
-      run: OMS_MODE=br IMG_NAME=oms-core USE_SSH=yes USERNAME=meow ${{ github.workspace }}/run.sh
+      run: |
+        OMS_MODE=br IMG_NAME=oms-core USE_SSH=yes USERNAME=meow \
+        TZ=Asia/Japan LOCALE=zh_TW.UTF-8 ${{ github.workspace }}/run.sh
       
     - name: Test username
-      run: docker exec oms-core runuser -l meow -c '[[ $(whoami) = meow ]] && echo User us customizable'
+      run: docker exec oms-core runuser -l meow -c 'test $(whoami) = meow && echo User us customizable'
     - name: Test existence of systemd
       run: docker exec oms-core systemctl
     - name: Check timezone
-      run: docker exec oms-core bash -c '[[ $(timedatectl show | grep -E "Timezone=" | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+" 2>/dev/null) ]] && echo Correct timezone'
+      run: |
+        docker exec oms-core bash -c \
+        'test $(timedatectl show | grep -E "Timezone=" | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+" 2>/dev/null) = Asia/Japan && echo Correct timezone'
     - name: Check locale
-      run: docker exec oms-core bash -c '[[ $(locale -a | grep -v C | grep -v POSIX | head -n 1) ]] && echo Correct locale'
+      run: |
+        docker exec oms-core bash -c \
+        'test $(locale -a | grep -v C | grep -v POSIX | head -n 1) = zh_TW.UTF-8 && echo Correct locale'
     - name: Check hostname
-      run: docker exec oms-core bash -c '[[ $(hostnamectl) = oms-core ]] && echo Correct hostname'
+      run: docker exec oms-core bash -c 'test $(hostnamectl) = oms-core && echo Correct hostname'
 
 
   ssh-test:
@@ -54,11 +60,13 @@ jobs:
       run: docker exec oms-ssh runuser -u runner -- sudo systemctl status ssh
 
     - name: Run ssh image with port expose
-      run: OMS_MODE=r IMG_NAME=oms-ssh CONTAINER_NAME=oms-ssh-expose USE_SSH=yes SSH_PORT=22222 ${{ github.workspace }}/run.sh
+      run: |
+        OMS_MODE=r IMG_NAME=oms-ssh CONTAINER_NAME=oms-ssh-expose \
+        USE_SSH=yes SSH_PORT=22222 ${{ github.workspace }}/run.sh
     - name: Test container status
       run: docker ps | grep oms-ssh-expose | grep '0.0.0.0:22222->22/tcp'
 
-      
+
   gui-integrated:
 
     runs-on: ubuntu-latest
