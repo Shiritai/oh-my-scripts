@@ -1,0 +1,329 @@
+name: Image Auto Test
+
+on:
+  push:
+    branches: [ "main", "feat/test-suite" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build-core:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build image
+        run: |
+          OMS_MODE=b IMG_NAME=oms-core USE_SSH=yes USERNAME=meow \
+          TZ=Asia/Tokyo LOCALE=zh_TW.UTF-8 ${{ github.workspace }}/run.sh
+      
+      - name: Export image
+        run: |
+          docker save oms-core > oms-core.tar
+          cp oms-core.tar /tmp/oms-core.tar
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oms-core
+          path: /tmp/oms-core.tar
+
+  
+  core-test:
+
+    runs-on: ubuntu-latest
+    needs: [build-core]
+    if: ${{ needs.build-core.result == 'success' }}
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: oms-core
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/oms-core.tar
+        docker image ls -a
+
+    - name: Run image
+      run: |
+        OMS_MODE=r IMG_NAME=oms-core USE_SSH=yes USERNAME=meow \
+        TZ=Asia/Tokyo LOCALE=zh_TW.UTF-8 ${{ github.workspace }}/run.sh
+
+    - name: Test username
+      run: docker exec oms-core runuser -l meow -c 'test $(whoami) = meow && echo Correct username'
+    - name: Check and start systemd
+      run: docker exec oms-core bash -c 'systemctl status dbus || systemctl restart dbus'
+    - name: Test existence of systemd
+      run: docker exec oms-core systemctl
+    - name: Check timezone
+      run: |
+        docker exec oms-core bash -c \
+        'test $(timedatectl show | grep -E "Timezone=" | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+" 2>/dev/null) = "Asia/Tokyo" && echo Correct timezone'
+    - name: Check locale
+      run: |
+        docker exec oms-core bash -c \
+        'test $(locale -a | grep -v C | grep -v POSIX | head -n 1) = zh_TW.utf8 && echo Correct locale'
+    - name: Check hostname
+      run: docker exec oms-core bash -c 'test $(sed "s/^[^-]*-//;s/-/./g" <<< $HOSTNAME) && echo Correct hostname'
+
+
+  ssh-test:
+
+    runs-on: ubuntu-latest
+    needs: [build-core]
+    if: ${{ needs.build-core.result == 'success' }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: oms-core
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/oms-core.tar
+        docker image ls -a
+
+    - name: Build ssh image
+      run: OMS_MODE=b IMG_NAME=oms-ssh USE_SSH=yes ${{ github.workspace }}/run.sh
+    
+    - name: Run ssh image without port expose
+      run: OMS_MODE=r IMG_NAME=oms-ssh USE_SSH=yes ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-ssh
+
+    - name: Test whether oms-ssh is built and run currectly
+      run: docker exec oms-ssh runuser -u runner -- sudo systemctl status ssh || true
+    - name: Try to start ssh
+      run: docker exec oms-ssh runuser -u runner -- sudo systemctl start ssh
+    - name: Check ssh
+      run: docker exec oms-ssh runuser -u runner -- sudo systemctl status ssh
+
+    - name: Run ssh image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-ssh CONTAINER_NAME=oms-ssh-expose \
+        USE_SSH=yes SSH_PORT=22222 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-ssh-expose | grep '0.0.0.0:22222->22/tcp'
+
+
+  build-gui:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build image
+        run: |
+          BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=b IMG_NAME=oms-gnome \
+          USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+      
+      - name: Export image
+        run: |
+          docker save oms-gnome > oms-gnome.tar
+          cp oms-gnome.tar /tmp/oms-gnome.tar
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oms-gnome
+          path: /tmp/oms-gnome.tar
+      
+  gnome:
+
+    needs: [build-gui]
+    if: ${{ needs.build-gui.result == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: oms-gnome
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/oms-gnome.tar
+        docker image ls -a
+
+    - name: Build gnome image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-gnome \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    - name: Test whether oms-gnome is built and run currectly
+      run: docker exec oms-gnome runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-gnome runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-gnome runuser -u runner -- sudo systemctl status tigervnc@:1
+
+
+  vnc:
+
+    needs: [build-gui]
+    if: ${{ needs.build-gui.result == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: oms-gnome
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/oms-gnome.tar
+        docker image ls -a
+
+    - name: Build vnc image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-vnc \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    - name: Test whether oms-vnc is built and run currectly
+      run: docker exec oms-vnc runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-vnc runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-vnc runuser -u runner -- sudo systemctl status tigervnc@:1
+      
+    - name: Run vnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-vnc CONTAINER_NAME=oms-vnc-expose-vnc \
+        USE_VNC=yes VNC_PORT=8888 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-vnc-expose-vnc | grep '0.0.0.0:8888->5901/tcp'
+
+
+  novnc:
+
+    needs: [build-gui]
+    if: ${{ needs.build-gui.result == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: oms-gnome
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/oms-gnome.tar
+        docker image ls -a
+
+    - name: Build novnc image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-novnc \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    # note: use novnc should automaticallt have vnc setup
+    - name: Test whether oms-novnc is built and run currectly
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status tigervnc@:1
+      
+    - name: Test whether oms-novnc is built and run currectly
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status novnc || true
+    - name: Try to start novnc
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl start novnc
+    - name: Check novnc
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status novnc
+
+    - name: Run vnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-novnc CONTAINER_NAME=oms-novnc-expose-vnc \
+        USE_VNC=yes VNC_PORT=8888 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-novnc-expose-vnc | grep '0.0.0.0:8888->5901/tcp'
+
+    - name: Run novnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-novnc CONTAINER_NAME=oms-novnc-expose-novnc \
+        USE_NO_VNC=yes NO_VNC_PORT=9999 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-novnc-expose-novnc | grep '0.0.0.0:9999->6901/tcp'
+
+
+  gui-integrated:
+
+    needs: [build-gui]
+    if: ${{ needs.build-gui.result == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: oms-gnome
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/oms-gnome.tar
+        docker image ls -a
+
+    - name: Build GUI integrated image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-gui \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    # note: use novnc should automaticallt have vnc setup
+    - name: Test whether oms-gui is built and run currectly
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status tigervnc@:1
+      
+    - name: Test whether oms-gui is built and run currectly
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status gdm || true
+    - name: Try to start gdm
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl start gdm
+    - name: Check gdm
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status gdm
+      
+    - name: Test whether oms-gui is built and run currectly
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status novnc || true
+    - name: Try to start novnc
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl start novnc
+    - name: Check novnc
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status novnc
+
+    - name: Run vnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-gui CONTAINER_NAME=oms-gui-expose-vnc \
+        USE_VNC=yes VNC_PORT=8888 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-gui-expose-vnc | grep '0.0.0.0:8888->5901/tcp'
+
+    - name: Run novnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-gui CONTAINER_NAME=oms-gui-expose-novnc \
+        USE_NO_VNC=yes NO_VNC_PORT=9999 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-gui-expose-novnc | grep '0.0.0.0:9999->6901/tcp'
