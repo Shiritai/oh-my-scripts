@@ -17,6 +17,6 @@ jobs:
     - name: Build ssh test Docker image
       run: OMS_MODE=br IMG_NAME=oms USE_SSH=yes ${{ github.workspace }}/run.sh
     - name: Test container status
-      run: docker ps
+      run: docker ps | grep oms
     - name: Test whether oms is built and run currectly
-      run: docker exec oms systemctl status ssh
+      run: docker exec oms runuser -u runner -- sudo systemctl status ssh
