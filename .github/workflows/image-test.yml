@@ -14,13 +14,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build ssh test Docker image
-      run: OMS_MODE=br IMG_NAME=oms USE_SSH=yes ${{ github.workspace }}/run.sh
+    
+    - name: Build ssh image
+      run: OMS_MODE=b IMG_NAME=oms-ssh USE_SSH=yes ${{ github.workspace }}/run.sh
+    
+    - name: Run ssh image without port expose
+      run: OMS_MODE=r IMG_NAME=oms-ssh USE_SSH=yes ${{ github.workspace }}/run.sh
     - name: Test container status
-      run: docker ps | grep oms
-    - name: Test whether oms is built and run currectly
-      run: docker exec oms runuser -u runner -- sudo systemctl status ssh || true
+      run: docker ps | grep oms-ssh
+
+    - name: Test whether oms-ssh is built and run currectly
+      run: docker exec oms-ssh runuser -u runner -- sudo systemctl status ssh || true
     - name: Try to start ssh
-      run: docker exec oms runuser -u runner -- sudo systemctl start ssh
+      run: docker exec oms-ssh runuser -u runner -- sudo systemctl start ssh
     - name: Try to start ssh
-      run: docker exec oms runuser -u runner -- sudo systemctl status ssh
+      run: docker exec oms-ssh runuser -u runner -- sudo systemctl status ssh
+
+    - name: Run ssh image with port expose
+      run: OMS_MODE=r IMG_NAME=oms-ssh CONTAINER_NAME=oms-ssh-expose USE_SSH=yes SSH_PORT=22222 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-ssh-expose | grep '0.0.0.0:22222->22/tcp'
