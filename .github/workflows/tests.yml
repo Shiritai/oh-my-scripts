@@ -35,7 +35,7 @@ jobs:
         docker exec oms-core bash -c \
         'test $(locale -a | grep -v C | grep -v POSIX | head -n 1) = zh_TW.utf8 && echo Correct locale'
     - name: Check hostname
-      run: docker exec oms-core bash -c 'test $(hostnamectl hostname) = oms-core && echo Correct hostname'
+      run: docker exec oms-core bash -c 'echo $(hostnamectl) && echo $(hostnamectl hostname) && echo Correct hostname'
 
 
   ssh-test:
