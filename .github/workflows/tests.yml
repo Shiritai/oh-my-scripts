@@ -65,8 +65,22 @@ jobs:
       run: docker ps | grep oms-ssh-expose | grep '0.0.0.0:22222->22/tcp'
 
 
+  gui_related:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build gnome image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=b IMG_NAME=oms-gnome \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+      
   gnome:
 
+    needs: [gui_related]
+    if: ${{ needs.gui_related.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -87,6 +101,8 @@ jobs:
 
   vnc:
 
+    needs: [gui_related]
+    if: ${{ needs.gui_related.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -114,6 +130,8 @@ jobs:
 
   novnc:
 
+    needs: [gui_related]
+    if: ${{ needs.gui_related.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -156,6 +174,8 @@ jobs:
 
   gui-integrated:
 
+    needs: [gui_related]
+    if: ${{ needs.gui_related.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
