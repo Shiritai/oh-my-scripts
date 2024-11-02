@@ -19,4 +19,4 @@ jobs:
     - name: Test container status
       run: docker ps
     - name: Test whether oms is built and run currectly
-      run: docker exec -it oms systemctl status ssh
+      run: docker exec oms systemctl status ssh
