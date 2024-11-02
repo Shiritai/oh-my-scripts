@@ -11,7 +11,7 @@ OMS_VERSION='0.1.0'
 
 BASE_IMG=${BASE_IMG:-'ubuntu:20.04'}
 IMG_NAME=${IMG_NAME:-'oh-my-c'}
-CONTAINER_NAME=${CONTAINER_NAME:-IMG_NAME}
+CONTAINER_NAME=${CONTAINER_NAME:-$IMG_NAME}
 
 LOCALE=${LOCALE:-$((locale -a | grep -v C | grep -v POSIX | head -n 1) || echo '')}
 TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA-Z]+' 2>/dev/null || echo "")}
