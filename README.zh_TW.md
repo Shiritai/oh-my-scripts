@@ -28,6 +28,8 @@ Possible <MODE_FLAGs>:
 
 其有許多參數，可參閱 `run.sh` 前半部 `Customizable Parameters` 做變數的設定。
 
+可用 `OMS_MODE=d ./run.sh` (dry-run) 顯示所有執行用參數。
+
 ```bash
 # ----------- [Customizable Parameters] -----------
 

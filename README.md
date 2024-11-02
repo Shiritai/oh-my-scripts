@@ -30,6 +30,8 @@ Run `run.sh`。
 
 It has many parameters. You can refer to the first half of `run.sh` under the section `Customizable Parameters` for variable settings.
 
+You can use `OMS_MODE=d ./run.sh` (dry-run) to show the arguments for execution.
+
 ```bash
 # ----------- [Customizable Parameters] -----------
 
