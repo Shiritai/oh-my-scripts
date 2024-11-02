@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# Script dependencies: `zip` and `docker`
+# oh-my-scripts: (in short: `oms`)
+#   The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
+OMS_VERSION='0.1.0'
+
+# See `print_help` function for more information
+# p.s. dependencies: `zip` and `docker`
 
 # ----------- [Customizable Parameters] -----------
 
@@ -120,7 +125,8 @@ print_all_args() {
     \"RUN_ADDITIONAL_ARGS\": \"$RUN_ADDITIONAL_ARGS\",
     \"CUSTOM_SCRIPTS_PATH\": \"$CUSTOM_SCRIPTS_PATH\",
     \"DEV_SCRIPTS_PATH\": \"$DEV_SCRIPTS_PATH\",
-    \"OMS_MODE\": \"$OMS_MODE\"
+    \"OMS_MODE\": \"$OMS_MODE\",
+    \"OMS_VERSION\": \"$OMS_VERSION\"
 }"
 }
 
