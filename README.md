@@ -1,5 +1,8 @@
 # oh-my-scripts
 
+> [!NOTE]
+> For Chinese document, please check [this document (中文文檔).](./README.zh_TW.md)
+
 ```bash
 > OMS_MODE=h ./run.sh
 oh-my-scripts:
@@ -16,8 +19,6 @@ Possible <MODE_FLAGs>:
 
 For all possible [ARG=VALUE]s, please refer to the parameter part of this scripts
 ```
-
-[For Chinese document, please check this document (中文文檔).](./README.zh_TW.md)
 
 Containerization is a great technology. It allows tasks such as building, removing, and migrating identical environments to perform far faster than virtual machines. With it, we can almost instantly deploy services using pre-built images by others.
 
