@@ -19,7 +19,8 @@ TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA
 # Systemd support
 USE_SYSTEMD=${USE_SYSTEMD:-'yes'} # yes or no
 
-USERNAME=${USERNAME:-$USER} # Username of the container
+# Username of the container
+USERNAME=${USERNAME:-$USER}
 # Change user password if needed
 USE_USER_PSWD=${USE_USER_PSWD:-'no'}
 USER_PSWD=${USER_PSWD:-'CHANGE_ME'}

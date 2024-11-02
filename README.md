@@ -1,8 +1,20 @@
 # oh-my-scripts
 
-The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
+```bash
+> OMS_MODE=h ./run.sh
+oh-my-scripts:
+    The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
 
-For (Traditional) Chinese document, please check [this document](./README.zh_TW.md).
+Usage: ./run.sh OMS_MODE=<MODE_FLAGs> ...
+
+Possible <MODE_FLAGs>:
+    b: build image
+    r: run image
+    d: dry-run mode, will only shows all the arguments in json form without conducting any real sction
+    h: print this help message and exit
+```
+
+[For Chinese document, please check this document (中文文檔).](./README.zh_TW.md)
 
 Containerization is a great technology. It allows tasks such as building, removing, and migrating identical environments to perform far faster than virtual machines. With it, we can almost instantly deploy services using pre-built images by others.
 
@@ -21,24 +33,22 @@ It has many parameters. You can refer to the first half of `run.sh` under the se
 ```bash
 # ----------- [Customizable Parameters] -----------
 
-BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
-IMG_NAME=${IMG_NAME:-oh-my-c} # oh-my-container
+BASE_IMG=${BASE_IMG:-'ubuntu:20.04'}
+IMG_NAME=${IMG_NAME:-'oh-my-c'}
+CONTAINER_NAME=${CONTAINER_NAME:-IMG_NAME}
 
-LOCALE=${LOCALE:-$(locale -a | grep -v C | grep -v POSIX | head -n 1)}
-TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+")}
+LOCALE=${LOCALE:-$((locale -a | grep -v C | grep -v POSIX | head -n 1) || echo '')}
+TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA-Z]+' 2>/dev/null || echo "")}
 
 # Systemd support
-USE_SYSTEMD=${USE_SYSTEMD:-yes} # yes or no
+USE_SYSTEMD=${USE_SYSTEMD:-'yes'} # yes or no
 
-$USERNAME=${$USERNAME:-$USER} # Username of the container
-# Feel free to change user password if needed
-USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
-
-USE_GPU=${USE_GPU:-no} # yes or no
+# Username of the container
+USERNAME=${USERNAME:-$USER}
 
 # ...
 
-# ----------- [Execution Part] -----------
+# ----------- [Util Part] -----------
 ```
 
 `run.sh` will:

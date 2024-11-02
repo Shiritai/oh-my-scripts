@@ -1,6 +1,18 @@
 # oh-my-scripts
 
-The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
+```bash
+> OMS_MODE=h ./run.sh
+oh-my-scripts:
+    The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
+
+Usage: ./run.sh OMS_MODE=<MODE_FLAGs> ...
+
+Possible <MODE_FLAGs>:
+    b: build image
+    r: run image
+    d: dry-run mode, will only shows all the arguments in json form without conducting any real sction
+    h: print this help message and exit
+```
 
 容器化 (Containerization) 是個好東西，它使快速建立、消除、移植相同環境等任務有著遠超於虛擬機的表現，使我們幾乎一瞬間就能利用他人建構好的 image 快速部署服務。
 
@@ -16,29 +28,25 @@ The scripting tool for container environment build-up development. OH MY SCRIPTS
 
 其有許多參數，可參閱 `run.sh` 前半部 `Customizable Parameters` 做變數的設定。
 
-(TODO: 非設定命令行參數的的參數化)
-
 ```bash
 # ----------- [Customizable Parameters] -----------
 
-BASE_IMG=${BASE_IMG:-"ubuntu:20.04"}
-IMG_NAME=${IMG_NAME:-oh-my-c} # oh-my-container
+BASE_IMG=${BASE_IMG:-'ubuntu:20.04'}
+IMG_NAME=${IMG_NAME:-'oh-my-c'}
+CONTAINER_NAME=${CONTAINER_NAME:-IMG_NAME}
 
-LOCALE=${LOCALE:-$(locale -a | grep -v C | grep -v POSIX | head -n 1)}
-TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o "[a-zA-Z]+\/[a-zA-Z]+")}
+LOCALE=${LOCALE:-$((locale -a | grep -v C | grep -v POSIX | head -n 1) || echo '')}
+TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA-Z]+' 2>/dev/null || echo "")}
 
 # Systemd support
-USE_SYSTEMD=${USE_SYSTEMD:-yes} # yes or no
+USE_SYSTEMD=${USE_SYSTEMD:-'yes'} # yes or no
 
-$USERNAME=${$USERNAME:-$USER} # Username of the container
-# Feel free to change user password if needed
-USER_PSWD=${USER_PSWD:-"CHANGE_ME"}
-
-USE_GPU=${USE_GPU:-no} # yes or no
+# Username of the container
+USERNAME=${USERNAME:-$USER}
 
 # ...
 
-# ----------- [Execution Part] -----------
+# ----------- [Util Part] -----------
 ```
 
 `run.sh` 會依序:
