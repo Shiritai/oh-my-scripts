@@ -173,9 +173,10 @@ if [[ $OMS_MODE = *'h'* ]]; then
     exit
 fi
 
+# print dry-run messages
+print_all_args
 if [[ $OMS_MODE = *'d'* ]]; then
-    # print dry-run messages and quit
-    print_all_args
+    # if in dry-run mode, quit after print
     exit
 fi
 
