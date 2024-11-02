@@ -70,9 +70,59 @@ DEV_SCRIPTS_PATH=${DEV_SCRIPTS_PATH:-"$SCRIPT_DIR/scripts/dev"}
 # b: build only
 # r: run only
 # br: build and run
-OMS_MODE=${OMS_MODE:-'br'}
+# h: print help
+# d: dry-run
+OMS_MODE=${OMS_MODE:-'h'}
 
 # ----------- [Util Part] -----------
+
+# print help messages
+print_help() {
+    echo "oh-my-scripts:
+    The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
+
+Usage: ./run.sh OMS_MODE=<MODE_FLAGs> ...
+
+Possible <MODE_FLAGs>:
+    b: build image
+    r: run image
+    d: dry-run mode, will only shows all the arguments in json form without conducting any real sction
+    h: print this help message and exit
+"
+}
+
+# print summary in json form
+print_all_args() {
+    echo "{
+    \"BASE_IMG\": \"$BASE_IMG\",
+    \"IMG_NAME\": \"$IMG_NAME\",
+    \"CONTAINER_NAME\": \"$CONTAINER_NAME\",
+    \"LOCALE\": \"$LOCALE\",
+    \"TZ\": \"$TZ\",
+    \"USE_SYSTEMD\": \"$USE_SYSTEMD\",
+    \"USERNAME\": \"$USERNAME\",
+    \"USE_USER_PSWD\": \"$USE_USER_PSWD\",
+    \"USER_PSWD\": \"$USER_PSWD\",
+    \"USE_GPU\": \"$USE_GPU\",
+    \"USE_NO_VNC\": \"$USE_NO_VNC\",
+    \"NO_VNC_PORT\": \"$NO_VNC_PORT\",
+    \"USE_VNC\": \"$USE_VNC\",
+    \"VNC_PORT\": \"$VNC_PORT\",
+    \"USE_SSH\": \"$USE_SSH\",
+    \"SSH_PORT\": \"$SSH_PORT\",
+    \"USE_OMZ\": \"$USE_OMZ\",
+    \"USE_GUI\": \"$USE_GUI\",
+    \"USE_APP\": \"$USE_APP\",
+    \"USE_MOUNT_DIR\": \"$USE_MOUNT_DIR\",
+    \"MOUNT_DIR\": \"$MOUNT_DIR\",
+    \"BUILD_ADDITIONAL_ARGS\": \"$BUILD_ADDITIONAL_ARGS\",
+    \"RUN_ADDITIONAL_ARGS\": \"$RUN_ADDITIONAL_ARGS\",
+    \"RUN_ADDITIONAL_ARGS\": \"$RUN_ADDITIONAL_ARGS\",
+    \"CUSTOM_SCRIPTS_PATH\": \"$CUSTOM_SCRIPTS_PATH\",
+    \"DEV_SCRIPTS_PATH\": \"$DEV_SCRIPTS_PATH\",
+    \"OMS_MODE\": \"$OMS_MODE\"
+}"
+}
 
 get_absolute_path_if_is_relative() {
     if [[ "$1" = /* ]]; then # absolute, do nothing
@@ -106,13 +156,26 @@ DEV_SCRIPTS_PATH=$(get_absolute_path_if_is_relative $DEV_SCRIPTS_PATH)
 # assigned by user), make it absolute.
 MOUNT_DIR=$(get_absolute_path_if_is_relative $MOUNT_DIR)
 
+# ----------- [Confirmation Part] -----------
+
+if [[ $OMS_MODE = *'h'* ]]; then
+    print_help
+    exit
+fi
+
+if [[ $OMS_MODE = *'d'* ]]; then
+    # print dry-run messages and quit
+    print_all_args
+    exit
+fi
+
 # ----------- [Execution Part] -----------
 
 # stack 1: ensure that we're running the script in correct directory
 OLD_DIR=$pwd
 cd $SCRIPT_DIR
 
-if [[ $OMS_MODE = *'b'* ]]; then
+if [[ $OMS_MODE = *'b'* && $OMS_MODE != *'d'* ]]; then
     # stack 2: zip scripts to a single file for image building
     # zip util scripts once, since files here seldom changes
     if ! [[ -f scripts-utils.zip ]]; then dir_to_zip scripts-utils.zip scripts/utils; fi
@@ -156,7 +219,7 @@ if [[ $OMS_MODE = *'b'* ]]; then
     rm scripts-dev.zip
 fi
 
-if [[ $OMS_MODE = *'r'* ]]; then
+if [[ $OMS_MODE = *'r'* && $OMS_MODE != *'d'* ]]; then
     # run container
     sudo docker run -d -it \
                     $([[ $USE_MOUNT_DIR = 'yes' ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
