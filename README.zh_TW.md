@@ -5,13 +5,16 @@
 oh-my-scripts:
     The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
 
-Usage: ./run.sh OMS_MODE=<MODE_FLAGs> ...
+Usage: OMS_MODE=<MODE_FLAGs> [ARG=VALUE]... ./run.sh
 
 Possible <MODE_FLAGs>:
     b: build image
-    r: run image
+    r: run container
+    br: build image and run container
     d: dry-run mode, will only shows all the arguments in json form without conducting any real sction
     h: print this help message and exit
+
+For all possible [ARG=VALUE]s, please refer to the parameter part of this scripts
 ```
 
 容器化 (Containerization) 是個好東西，它使快速建立、消除、移植相同環境等任務有著遠超於虛擬機的表現，使我們幾乎一瞬間就能利用他人建構好的 image 快速部署服務。

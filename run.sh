@@ -87,13 +87,16 @@ print_help() {
     echo "oh-my-scripts:
     The scripting tool for container environment build-up development. OH MY SCRIPTS!!!
 
-Usage: ./run.sh OMS_MODE=<MODE_FLAGs> ...
+Usage: OMS_MODE=<MODE_FLAGs> [ARG=VALUE]... ./run.sh
 
 Possible <MODE_FLAGs>:
     b: build image
-    r: run image
+    r: run container
+    br: build image and run container
     d: dry-run mode, will only shows all the arguments in json form without conducting any real sction
     h: print this help message and exit
+
+For all possible [ARG=VALUE]s, please refer to the parameter part of this scripts
 "
 }
 
