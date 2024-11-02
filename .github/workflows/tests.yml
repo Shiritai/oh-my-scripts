@@ -21,15 +21,15 @@ jobs:
       run: OMS_MODE=br IMG_NAME=oms-core USE_SSH=yes USERNAME=meow ${{ github.workspace }}/run.sh
       
     - name: Test username
-      run: docker exec oms-core runuser -u meow -- [[ $(whoami) = meow ]] && echo 'User us customizable'
+      run: docker exec oms-core runuser -l meow -c "[[ $(whoami) = meow ]] && echo 'User us customizable'"
     - name: Test existence of systemd
       run: docker exec oms-core systemctl
     - name: Check timezone
-      run: docker exec oms-core runuser -u meow -- [[ $(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA-Z]+' 2>/dev/null) ]] && echo 'Correct timezone'
+      run: docker exec oms-core bash -c "[[ $(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA-Z]+' 2>/dev/null) ]] && echo 'Correct timezone'"
     - name: Check locale
-      run: docker exec oms-core runuser -u meow -- [[ $(locale -a | grep -v C | grep -v POSIX | head -n 1) ]] && echo 'Correct locale'
+      run: docker exec oms-core bash -c "[[ $(locale -a | grep -v C | grep -v POSIX | head -n 1) ]] && echo 'Correct locale'"
     - name: Check hostname
-      run: docker exec oms-core runuser -u [[ $(hostnamectl) = oms-core ]] && echo 'Correct hostname'
+      run: docker exec oms-core bash -c "[[ $(hostnamectl) = oms-core ]] && echo 'Correct hostname'"
 
 
   ssh-test:
