@@ -14,9 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    # USE_SSH is for systemctl to be available
     - name: Build image
       run: |
-        OMS_MODE=br IMG_NAME=oms-core USERNAME=meow \
+        OMS_MODE=br IMG_NAME=oms-core USE_SSH=yes USERNAME=meow \
         TZ=Asia/Tokyo LOCALE=zh_TW.UTF-8 ${{ github.workspace }}/run.sh
       
     - name: Test username
@@ -64,6 +65,95 @@ jobs:
       run: docker ps | grep oms-ssh-expose | grep '0.0.0.0:22222->22/tcp'
 
 
+  gnome:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build gnome image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-gnome \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    - name: Test whether oms-gnome is built and run currectly
+      run: docker exec oms-gnome runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-gnome runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-gnome runuser -u runner -- sudo systemctl status tigervnc@:1
+
+
+  vnc:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build vnc image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-vnc \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    - name: Test whether oms-vnc is built and run currectly
+      run: docker exec oms-vnc runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-vnc runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-vnc runuser -u runner -- sudo systemctl status tigervnc@:1
+      
+    - name: Run vnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-vnc CONTAINER_NAME=oms-vnc-expose-vnc \
+        USE_VNC=yes VNC_PORT=8888 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-vnc-expose-vnc | grep '0.0.0.0:8888->5901/tcp'
+
+
+  novnc:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build novnc image
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-novnc \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    # note: use novnc should automaticallt have vnc setup
+    - name: Test whether oms-novnc is built and run currectly
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status tigervnc@:1
+      
+    - name: Test whether oms-novnc is built and run currectly
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status novnc || true
+    - name: Try to start novnc
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl start novnc
+    - name: Check novnc
+      run: docker exec oms-novnc runuser -u runner -- sudo systemctl status novnc
+
+    - name: Run vnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-novnc CONTAINER_NAME=oms-novnc-expose-vnc \
+        USE_VNC=yes VNC_PORT=8888 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-novnc-expose-vnc | grep '0.0.0.0:8888->5901/tcp'
+
+    - name: Run novnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-novnc CONTAINER_NAME=oms-novnc-expose-novnc \
+        USE_NO_VNC=yes NO_VNC_PORT=9999 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-novnc-expose-novnc | grep '0.0.0.0:9999->6901/tcp'
+
+
   gui-integrated:
 
     runs-on: ubuntu-latest
@@ -71,10 +161,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Since the building process of novnc, vnc and gnome are so long
-    # that we combine into a single test for shorter action runtime
     - name: Build GUI integrated image
-      run: BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-gui USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+      run: |
+        BASE_IMG=eroiko/oh-my-scripts:gnome-vnc OMS_MODE=br IMG_NAME=oms-gui \
+        USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
     
     # note: use novnc should automaticallt have vnc setup
     - name: Test whether oms-gui is built and run currectly
@@ -101,9 +191,9 @@ jobs:
     - name: Run vnc image with port expose
       run: |
         OMS_MODE=r IMG_NAME=oms-gui CONTAINER_NAME=oms-gui-expose-vnc \
-        USE_VNC=yes VNC_PORT=9999 ${{ github.workspace }}/run.sh
+        USE_VNC=yes VNC_PORT=8888 ${{ github.workspace }}/run.sh
     - name: Test container status
-      run: docker ps | grep oms-gui-expose-vnc | grep '0.0.0.0:9999->5901/tcp'
+      run: docker ps | grep oms-gui-expose-vnc | grep '0.0.0.0:8888->5901/tcp'
 
     - name: Run novnc image with port expose
       run: |
