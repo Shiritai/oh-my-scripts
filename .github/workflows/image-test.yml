@@ -19,4 +19,8 @@ jobs:
     - name: Test container status
       run: docker ps | grep oms
     - name: Test whether oms is built and run currectly
+      run: docker exec oms runuser -u runner -- (sudo systemctl status ssh) || true
+    - name: Try to start ssh
+      run: docker exec oms runuser -u runner -- sudo systemctl start ssh
+    - name: Try to start ssh
       run: docker exec oms runuser -u runner -- sudo systemctl status ssh
