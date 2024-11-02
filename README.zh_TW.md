@@ -1,5 +1,7 @@
 # oh-my-scripts
 
+## 懶人包
+
 ```bash
 > OMS_MODE=h ./run.sh
 oh-my-scripts:
@@ -17,6 +19,37 @@ Possible <MODE_FLAGs>:
 For all possible [ARG=VALUE]s, please refer to the parameter part of this scripts
 ```
 
+### 例子
+
+如果想
+
+* 建立 image
+* 其基於 `osrf/ros:humble-desktop-full`
+* 稱為 `oh-my-novnc`
+* 支援 Gnome GUI
+* 支援 `ssh`、`novnc`
+* 僅暴露 ssh port 為 `1234`
+
+```bash
+BASE_IMG=osrf/ros:humble-desktop-full \
+IMG_NAME=oh-my-novnc \
+USE_SSH=yes \
+SSH_PORT=1234 \
+USE_USER_PWSD=yes \ # optional for ssh login
+USER_PSWD=<YOUR_PASSWORD> \ # default to "CHANGE_ME"
+USE_GUI=yes \ # will install the minimal Gnome GUI for us
+USE_NO_VNC=yes \ # for port exposure, please assign `NO_VNC_PORT`
+VNC_PSWD=<VNC_LOGIN_PASSWORD> \ # optional, default to "vnc_pswd"
+OMS_MODE=b ./run.sh
+```
+
+> [!TIP]
+> 如果想立刻運行容器，請將最後一個參數改成 `OMS_MODE=br`.
+>
+> 容器名稱預設會和印象名稱相同，可透過 `CONTAINER_NAME` 覆寫.
+
+## 概述
+
 容器化 (Containerization) 是個好東西，它使快速建立、消除、移植相同環境等任務有著遠超於虛擬機的表現，使我們幾乎一瞬間就能利用他人建構好的 image 快速部署服務。
 
 話雖如此，作為提供服務的開發者，即建構某服務或某環境對應之開箱即用容器的開發者而言，撰寫 `Dockerfile` 與腳本，將其 `docker build` 後 `docker run` 來驗證結果，再修改 `Dockerfile` 重複前述過程的循環仍然是個冗長費神且不優雅的過程。
@@ -31,7 +64,8 @@ For all possible [ARG=VALUE]s, please refer to the parameter part of this script
 
 其有許多參數，可參閱 `run.sh` 前半部 `Customizable Parameters` 做變數的設定。
 
-可用 `OMS_MODE=d ./run.sh` (dry-run) 顯示所有執行用參數。
+> [!TIP]
+> 可用 `OMS_MODE=d ./run.sh` (dry-run) 顯示所有執行用參數。
 
 ```bash
 # ----------- [Customizable Parameters] -----------

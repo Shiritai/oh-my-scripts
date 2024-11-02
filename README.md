@@ -3,6 +3,8 @@
 > [!NOTE]
 > For Chinese document, please check [this document (中文文檔).](./README.zh_TW.md)
 
+## TL;DR
+
 ```bash
 > OMS_MODE=h ./run.sh
 oh-my-scripts:
@@ -20,6 +22,37 @@ Possible <MODE_FLAGs>:
 For all possible [ARG=VALUE]s, please refer to the parameter part of this scripts
 ```
 
+### Quick Examples
+
+If we want to
+
+* build a image
+* based on `osrf/ros:humble-desktop-full`
+* named `oh-my-novnc`
+* with Gnome GUI support
+* with `ssh` and `novnc` support
+* with ssh port exposed on `1234`
+
+```bash
+BASE_IMG=osrf/ros:humble-desktop-full \
+IMG_NAME=oh-my-novnc \
+USE_SSH=yes \
+SSH_PORT=1234 \
+USE_USER_PWSD=yes \ # optional for ssh login
+USER_PSWD=<YOUR_PASSWORD> \ # default to "CHANGE_ME"
+USE_GUI=yes \ # will install the minimal Gnome GUI for us
+USE_NO_VNC=yes \ # for port exposure, please assign `NO_VNC_PORT`
+VNC_PSWD=<VNC_LOGIN_PASSWORD> \ # optional, default to "vnc_pswd"
+OMS_MODE=b ./run.sh
+```
+
+> [!TIP]
+> If we want to run the image immediately, change the last argument to `OMS_MODE=br`.
+>
+> The container name will default to the image name, or you can set `CONTAINER_NAME` to overwrite it.
+
+## Abstract
+
 Containerization is a great technology. It allows tasks such as building, removing, and migrating identical environments to perform far faster than virtual machines. With it, we can almost instantly deploy services using pre-built images by others.
 
 That being said, for developers providing services, those who build a service or a corresponding ready-to-use container environment, writing a Dockerfile and scripts, followed by `docker build` and then `docker run` to verify the results, and then modifying the `Dockerfile` and repeating the process, is still a tedious, time-consuming, and inelegant.
@@ -34,7 +67,8 @@ Run `run.sh`。
 
 It has many parameters. You can refer to the first half of `run.sh` under the section `Customizable Parameters` for variable settings.
 
-You can use `OMS_MODE=d ./run.sh` (dry-run) to show the arguments for execution.
+> [!TIP]
+> You can use `OMS_MODE=d ./run.sh` (dry-run) to show the arguments for execution.
 
 ```bash
 # ----------- [Customizable Parameters] -----------
