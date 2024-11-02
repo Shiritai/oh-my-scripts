@@ -1,0 +1,57 @@
+name: Image Auto Test
+
+on:
+  push:
+    branches: [ "main", "feat/test-suite" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Since the building process of novnc, vnc and gnome are so long
+    # that we combine into a single test for shorter action runtime
+    - name: Build GUI integrated image
+      run: OMS_MODE=br IMG_NAME=oms-gui USE_NO_VNC=yes USE_GUI=yes ${{ github.workspace }}/run.sh
+    
+    # note: use novnc should automaticallt have vnc setup
+    - name: Test whether oms-gui is built and run currectly
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status tigervnc@:1 || true
+    - name: Try to start tigervnc@:1
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl start tigervnc@:1
+    - name: Check tigervnc@:1
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status tigervnc@:1
+      
+    - name: Test whether oms-gui is built and run currectly
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status gdm || true
+    - name: Try to start gdm
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl start gdm
+    - name: Check gdm
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status gdm
+      
+    - name: Test whether oms-gui is built and run currectly
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status novnc || true
+    - name: Try to start novnc
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl start novnc
+    - name: Check novnc
+      run: docker exec oms-gui runuser -u runner -- sudo systemctl status novnc
+
+    - name: Run vnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-gui CONTAINER_NAME=oms-gui-expose-vnc \
+        USE_VNC=yes VNC_PORT=9999 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-gui-expose-vnc | grep '0.0.0.0:9999->5901/tcp'
+
+    - name: Run novnc image with port expose
+      run: |
+        OMS_MODE=r IMG_NAME=oms-gui CONTAINER_NAME=oms-gui-expose-novnc \
+        USE_NO_VNC=yes NO_VNC_PORT=9999 ${{ github.workspace }}/run.sh
+    - name: Test container status
+      run: docker ps | grep oms-gui-expose-novnc | grep '0.0.0.0:9999->6901/tcp'

@@ -1,0 +1,31 @@
+name: Image Auto Test
+
+on:
+  push:
+    branches: [ "main", "feat/test-suite" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    # User test
+    - name: Build image
+      run: OMS_MODE=br IMG_NAME=oms-core USERNAME=meow ${{ github.workspace }}/run.sh
+      
+    - name: Test username
+      run: docker exec oms-vnc runuser -u meow -- [[ $(whoami) = meow ]] && echo 'User us customizable'
+    - name: Test existence of systemd
+      run: docker exec oms-vnc systemctl
+    - name: Check timezone
+      run: docker exec oms-vnc runuser -u meow -- [[ $(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA-Z]+' 2>/dev/null) ]] && echo 'Correct timezone'
+    - name: Check locale
+      run: docker exec oms-vnc runuser -u meow -- [[ $(locale -a | grep -v C | grep -v POSIX | head -n 1) ]] && echo 'Correct locale'
+    - name: Check hostname
+      run: docker exec oms-vnc runuser -u [[ $(hostnamectl) = oms-core ]] && echo 'Correct hostname'
