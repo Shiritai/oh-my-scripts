@@ -58,6 +58,8 @@ jobs:
 
     - name: Test username
       run: docker exec oms-core runuser -l meow -c 'test $(whoami) = meow && echo Correct username'
+    - name: Check and start systemd
+      run: docker exec oms-core nash -c 'systemctl status dbus || systemctl restart dbus'
     - name: Test existence of systemd
       run: docker exec oms-core systemctl
     - name: Check timezone
