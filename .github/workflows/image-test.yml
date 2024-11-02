@@ -2,7 +2,7 @@ name: Image Auto Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feat/test-suite" ]
   pull_request:
     branches: [ "main" ]
 
@@ -15,6 +15,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build ssh test Docker image
-      run: OMS_MODE=br IMG_NAME=oms USE_SSH=yes ${{ vars.GITHUB_WORKSPACE }}/run.sh
+      run: OMS_MODE=br IMG_NAME=oms USE_SSH=yes ${{ github.workspace }}/run.sh
     - name: Test whether oms is built and run currectly
       run: docker exec -it oms systemctl status ssh
