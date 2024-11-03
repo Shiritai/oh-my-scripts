@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build-core:
+  build-core-image:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,8 +34,8 @@ jobs:
   core-test:
 
     runs-on: ubuntu-latest
-    needs: [build-core]
-    if: ${{ needs.build-core.result == 'success' }}
+    needs: [build-core-image]
+    if: ${{ needs.build-core-image.result == 'success' }}
 
     steps:
     - uses: actions/checkout@v4
@@ -71,14 +71,14 @@ jobs:
         docker exec oms-core bash -c \
         'test $(locale -a | grep -v C | grep -v POSIX | head -n 1) = zh_TW.utf8 && echo Correct locale'
     - name: Check hostname
-      run: docker exec oms-core bash -c 'test $(sed "s/^[^-]*-//;s/-/./g" <<< $HOSTNAME) && echo Correct hostname'
+      run: docker exec oms-core bash -c 'echo $HOSTNAME && test $(sed "s/^[^-]*-//;s/-/./g" <<< $HOSTNAME) && echo Correct hostname'
 
 
   ssh-test:
 
     runs-on: ubuntu-latest
-    needs: [build-core]
-    if: ${{ needs.build-core.result == 'success' }}
+    needs: [build-core-image]
+    if: ${{ needs.build-core-image.result == 'success' }}
 
     steps:
     - uses: actions/checkout@v4
@@ -117,7 +117,7 @@ jobs:
       run: docker ps | grep oms-ssh-expose | grep '0.0.0.0:22222->22/tcp'
 
 
-  build-gui:
+  build-gui-image:
     runs-on: ubuntu-latest
 
     steps:
@@ -139,10 +139,10 @@ jobs:
           name: oms-gnome
           path: /tmp/oms-gnome.tar
       
-  gnome:
+  gnome-test:
 
-    needs: [build-gui]
-    if: ${{ needs.build-gui.result == 'success' }}
+    needs: [build-gui-image]
+    if: ${{ needs.build-gui-image.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -172,10 +172,10 @@ jobs:
       run: docker exec oms-gnome runuser -u runner -- sudo systemctl status tigervnc@:1
 
 
-  vnc:
+  vnc-test:
 
-    needs: [build-gui]
-    if: ${{ needs.build-gui.result == 'success' }}
+    needs: [build-gui-image]
+    if: ${{ needs.build-gui-image.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -212,10 +212,10 @@ jobs:
       run: docker ps | grep oms-vnc-expose-vnc | grep '0.0.0.0:8888->5901/tcp'
 
 
-  novnc:
+  novnc-test:
 
-    needs: [build-gui]
-    if: ${{ needs.build-gui.result == 'success' }}
+    needs: [build-gui-image]
+    if: ${{ needs.build-gui-image.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -267,10 +267,10 @@ jobs:
       run: docker ps | grep oms-novnc-expose-novnc | grep '0.0.0.0:9999->6901/tcp'
 
 
-  gui-integrated:
+  gui-integrated-test:
 
-    needs: [build-gui]
-    if: ${{ needs.build-gui.result == 'success' }}
+    needs: [build-gui-image]
+    if: ${{ needs.build-gui-image.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:

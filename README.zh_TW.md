@@ -44,9 +44,9 @@ OMS_MODE=b ./run.sh
 ```
 
 > [!TIP]
-> 如果想立刻運行容器，請將最後一個參數改成 `OMS_MODE=br`.
+> 如果想立刻運行容器，請將最後一個參數改成 `OMS_MODE=br`。
 >
-> 容器名稱預設會和印象名稱相同，可透過 `CONTAINER_NAME` 覆寫.
+> 容器名稱預設會和印象名稱相同，可透過 `CONTAINER_NAME` 覆寫。
 
 ## 概述
 
@@ -155,11 +155,119 @@ USERNAME=${USERNAME:-$USER}
 * Firefox: Linux 上最好用的瀏覽器
 * vscode: 好用的 IDE
 
+## 測試
+
+### 新增一個測試
+
+在 `.github/workflows/tests.yml`，我們可以新增一個測試工作如下:
+
+```yaml
+simple-test:
+
+  runs-on: ubuntu-latest
+
+  steps:
+  - uses: actions/checkout@v4
+
+  - name: Build and run image
+    run: OMS_MODE=br IMG_NAME=... ... ${{ github.workspace }}/run.sh
+
+  - name: Check build result A
+    run: docker exec ..., docker ps | grep ..., or else
+
+  - name: Check build result B
+    run: docker exec ..., docker ps | grep ..., or else
+  
+  ...
+```
+
+如果當中用到的鏡像可受益於其他測試工作，可以考慮將共用的容器建構步驟獨立成一個建構工作，並在測試工作依賴建構工作的運行結果，便能加速測試流程。
+
+* 建構工作
+
+  ```yaml
+  build-simple-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build image
+        run: |
+          OMS_MODE=b IMG_NAME=<ARTIFACT_NAME> ... ${{ github.workspace }}/run.sh
+      
+      - name: Export image
+        run: |
+          docker save <ARTIFACT_NAME> > <ARTIFACT_NAME>.tar
+          cp <ARTIFACT_NAME>.tar /tmp/<ARTIFACT_NAME>.tar
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: <ARTIFACT_NAME>
+          path: /tmp/<ARTIFACT_NAME>.tar
+  ```
+  
+* 測試工作
+
+  ```yaml
+  simple-test:
+
+    runs-on: ubuntu-latest
+    needs: [build-simple-image]
+    if: ${{ needs.build-simple-image.result == 'success' }}
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: <ARTIFACT_NAME>
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/<ARTIFACT_NAME>.tar
+        docker image ls -a
+
+    - name: Build and run image
+      run: |
+        OMS_MODE=br IMG_NAME=<ARTIFACT_NAME> ... ${{ github.workspace }}/run.sh
+  ```
+
+### 用預先建構好的鏡像
+
+若想進行耗時的測試工作，比如安裝套件耗時的工作，可以考慮使用預先建構的鏡像來加速測試，該鏡像應該只安裝套件而不涉及任何設定。
+
+可以將 `Dockerfile` 放在 `tests/prebuild-scripts/<image_name>/Dockerfile` 並執行 `tests/prebuild-all.sh` 來 ***互動式的*** 建構鏡像。
+
+```bash
+> <REPO>/scripts/run-with-utils.sh <REPO>/tests/prebuild-all.sh
+[INFO] Checking <...>/oh-my-scripts/tests for Dockerfile
+[INFO] Checking <...>/oh-my-scripts/tests/prebuild-scripts for Dockerfile
+[INFO] Checking <...>/oh-my-scripts/tests/prebuild-scripts/gnome-vnc for Dockerfile
+[INFO] Find Dockerfile in gnome-vnc, do you want to build this image? [y/N]
+<PLEASE ANSWER THIS QUESTION FOR ALL THE IMAGES [y/N]>
+```
+
+> [!NOTE]
+> 請注意 `<REPO>/tests/prebuild-all.sh` 會用到 `<REPO>/scripts/utils` 定義的函式。
+
+接著便能將鏡像標記並上傳，以上面的 `gnome-vnc` 為例:
+
+```bash
+docker image tag oh-my-scripts:gnome-vnc <DOCKER_HUB_USER>/oh-my-scripts:gnome-vnc
+docker push <DOCKER_HUB_USER>/oh-my-scripts:gnome-vnc
+```
+
+> [!IMPORTANT]
+> 請通知[我](https://github.com/Shiritai) (shingekinocore@gmail.com) 您想用我的鏡像遠端或直接用您的遠端.
+
 ## 未來目標 Roadmap
 
 ### 開發輔助 Dev tools
 
-* **建立測試框架**
 * 容器運行後執行之命令的自動記錄 (命令 - 結果)，並進一步自動腳本化
 * 容器的建構平行化: 支援同時建立多個容器，其建構時的的差異只有一小部分，對這些差異和對應的容器建立 pair 來追蹤，方便開發者快速嘗試多種 build 的 image
 

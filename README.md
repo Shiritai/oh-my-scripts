@@ -158,11 +158,119 @@ If you want to use these software applications, it is recommended to set `USE_GU
 * Firefox: best browser on Linux
 * vscode: handy IDE
 
+## Test
+
+### Add a new test
+
+In `.github/workflows/tests.yml`, we can add a simplest test job like:
+
+```yaml
+simple-test:
+
+  runs-on: ubuntu-latest
+
+  steps:
+  - uses: actions/checkout@v4
+
+  - name: Build and run image
+    run: OMS_MODE=br IMG_NAME=... ... ${{ github.workspace }}/run.sh
+
+  - name: Check build result A
+    run: docker exec ..., docker ps | grep ..., or else
+
+  - name: Check build result B
+    run: docker exec ..., docker ps | grep ..., or else
+  
+  ...
+```
+
+If the image you use can be benefit by other builds, you can then first upload the built image as artifact and download them in the other jobs to speedup test suite.
+
+* Build job
+
+  ```yaml
+  build-simple-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build image
+        run: |
+          OMS_MODE=b IMG_NAME=<ARTIFACT_NAME> ... ${{ github.workspace }}/run.sh
+      
+      - name: Export image
+        run: |
+          docker save <ARTIFACT_NAME> > <ARTIFACT_NAME>.tar
+          cp <ARTIFACT_NAME>.tar /tmp/<ARTIFACT_NAME>.tar
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: <ARTIFACT_NAME>
+          path: /tmp/<ARTIFACT_NAME>.tar
+  ```
+  
+* Job that use built image
+
+  ```yaml
+  simple-test:
+
+    runs-on: ubuntu-latest
+    needs: [build-simple-image]
+    if: ${{ needs.build-simple-image.result == 'success' }}
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: <ARTIFACT_NAME>
+        path: /tmp
+    
+    - name: Load image
+      run: |
+        docker load --input /tmp/<ARTIFACT_NAME>.tar
+        docker image ls -a
+
+    - name: Build and run image
+      run: |
+        OMS_MODE=br IMG_NAME=<ARTIFACT_NAME> ... ${{ github.workspace }}/run.sh
+  ```
+
+### Pre-builds
+
+To conduct unit or integration test on some new `core`/`common` plugin, which the build time may consume so much time, we can take the advantage of prebuild image that install and only install packages we need without further configurations.
+
+We can put the `Dockerfile` into `tests/prebuild-scripts/<image_name>/Dockerfile` and run `tests/prebuild-all.sh` to build all images ***INTERACTIVELY***.
+
+```bash
+> <REPO>/scripts/run-with-utils.sh <REPO>/tests/prebuild-all.sh
+[INFO] Checking <...>/oh-my-scripts/tests for Dockerfile
+[INFO] Checking <...>/oh-my-scripts/tests/prebuild-scripts for Dockerfile
+[INFO] Checking <...>/oh-my-scripts/tests/prebuild-scripts/gnome-vnc for Dockerfile
+[INFO] Find Dockerfile in gnome-vnc, do you want to build this image? [y/N]
+<PLEASE ANSWER THIS QUESTION FOR ALL THE IMAGES [y/N]>
+```
+
+> [!NOTE]
+> Note that `<REPO>/tests/prebuild-all.sh` also use functions defined in `<REPO>/scripts/utils`.
+
+Then you can mark the image to be uploadable and upload to docker hub. For example, the `gnome-vnc` image:
+
+```bash
+docker image tag oh-my-scripts:gnome-vnc <DOCKER_HUB_USER>/oh-my-scripts:gnome-vnc
+docker push <DOCKER_HUB_USER>/oh-my-scripts:gnome-vnc
+```
+
+> [!IMPORTANT]
+> Please let [me](https://github.com/Shiritai) (shingekinocore@gmail.com) know you want to use my remote image repo or you can just use your own remote.
+
 ## Roadmap
 
 ### Dev tools
 
-* **Establish a testing framework**
 * Automatically record the commands executed after the container is running (commands - results), and further automate the scripting process
 * Parallelize container building: support the simultaneous creation of multiple containers with only minor differences in their construction. Track these differences and their corresponding containers as pairs, making it easier for developers to quickly experiment with various built images.
 
