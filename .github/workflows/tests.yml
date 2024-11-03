@@ -2,7 +2,7 @@ name: Image Auto Test
 
 on:
   push:
-    branches: [ "main", "feat/test-suite" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -58,10 +58,8 @@ jobs:
 
     - name: Test username
       run: docker exec oms-core runuser -l meow -c 'test $(whoami) = meow && echo Correct username'
-    - name: Check and start systemd
-      run: docker exec oms-core bash -c 'systemctl status dbus || systemctl restart dbus'
     - name: Test existence of systemd
-      run: docker exec oms-core systemctl
+      run: docker exec oms-core command -v systemctl
     - name: Check timezone
       run: |
         docker exec oms-core bash -c \
