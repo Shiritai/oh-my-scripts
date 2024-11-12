@@ -9,5 +9,5 @@ sudo locale-gen
 
 sudo ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime
 echo ${TZ} | sudo tee /etc/timezone
-dpkg-reconfigure -f noninteractive tzdata
+sudo dpkg-reconfigure -f noninteractive tzdata
 sudo systemctl enable systemd-timedated
