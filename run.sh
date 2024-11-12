@@ -233,7 +233,7 @@ fi
 if [[ $OMS_MODE = *'r'* && $OMS_MODE != *'d'* ]]; then
     # run container
     sudo docker run -d -it \
-                    $([[ $USE_MOUNT_DIR = 'yes' ]] && echo "-v $MOUNT_DIR:/home/${USER}/data") \
+                    $([[ $USE_MOUNT_DIR = 'yes' ]] && echo "-v $MOUNT_DIR:/home/${USERNAME}/data") \
                     $([[ $USE_GPU = 'yes' ]] && echo "--gpus all") \
                     $([[ $USE_SYSTEMD = 'yes' ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
                                                         --cap-add SYS_BOOT --cap-add SYS_ADMIN
