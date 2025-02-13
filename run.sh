@@ -20,7 +20,7 @@ TZ=${TZ:-$(timedatectl show | grep -E 'Timezone=' | grep -E -o '[a-zA-Z]+\/[a-zA
 USE_SYSTEMD=${USE_SYSTEMD:-'yes'} # yes or no
 
 # Username of the container
-USERNAME=${USERNAME:-$USER}
+CONTAINER_USER=${CONTAINER_USER:-$USER}
 # Change user password if needed
 USE_USER_PSWD=${USE_USER_PSWD:-'no'}
 USER_PSWD=${USER_PSWD:-'CHANGE_ME'}
@@ -109,7 +109,7 @@ print_all_args() {
     \"LOCALE\": \"$LOCALE\",
     \"TZ\": \"$TZ\",
     \"USE_SYSTEMD\": \"$USE_SYSTEMD\",
-    \"USERNAME\": \"$USERNAME\",
+    \"CONTAINER_USER\": \"$CONTAINER_USER\",
     \"USE_USER_PSWD\": \"$USE_USER_PSWD\",
     \"USER_PSWD\": \"$USER_PSWD\",
     \"USE_GPU\": \"$USE_GPU\",
@@ -209,7 +209,7 @@ if [[ $OMS_MODE = *'b'* && $OMS_MODE != *'d'* ]]; then
                       --build-arg LOCALE="${LOCALE}" \
                       --build-arg TZ="${TZ}" \
                       --build-arg USE_SYSTEMD="${USE_SYSTEMD}" \
-                      --build-arg USER="${USERNAME}" \
+                      --build-arg USER="${CONTAINER_USER}" \
                       --build-arg USE_SSH="${USE_SSH}" \
                       --build-arg USE_VNC="${USE_VNC}" \
                       --build-arg VNC_PSWD="${VNC_PSWD}" \
@@ -232,7 +232,7 @@ fi
 if [[ $OMS_MODE = *'r'* && $OMS_MODE != *'d'* ]]; then
     # run container
     sudo docker run -d -it \
-                    $([[ $USE_MOUNT_DIR = 'yes' ]] && echo "-v $MOUNT_DIR:/home/${USERNAME}/data") \
+                    $([[ $USE_MOUNT_DIR = 'yes' ]] && echo "-v $MOUNT_DIR:/home/${CONTAINER_USER}/data") \
                     $([[ $USE_GPU = 'yes' ]] && echo "--gpus all") \
                     $([[ $USE_SYSTEMD = 'yes' ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
                                                         --cap-add SYS_BOOT --cap-add SYS_ADMIN
