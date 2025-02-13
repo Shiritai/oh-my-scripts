@@ -104,5 +104,4 @@ RUN apt-get clean && \
     /lib/systemd/system/systemd-update-utmp* \
     /lib/systemd/system/systemd-resolved.service
 
-# Default to bash, override to `/sbin/init` in run if `USE_SYSTEMD` is enabled
-CMD [ "/bin/bash" ]
+CMD [ "/sbin/init" ]

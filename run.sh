@@ -242,8 +242,9 @@ if [[ $OMS_MODE = *'r'* && $OMS_MODE != *'d'* ]]; then
                     $([[ $USE_SSH = 'yes' && $SSH_PORT != 'none' ]] && echo "-p $SSH_PORT:22") \
                     $(echo ${RUN_ADDITIONAL_ARGS}) \
                     -h ${CONTAINER_NAME} \
+                    $([[ $USE_SYSTEMD = 'no' ]] && echo "-u ${CONTAINER_USER} -w /home/${CONTAINER_USER}") \
                     --name ${CONTAINER_NAME} \
-                    ${IMG_NAME} $([[ $USE_SYSTEMD = 'yes' ]] && echo "/sbin/init")
+                    ${IMG_NAME} $([[ $USE_SYSTEMD = 'no' ]] && echo "/bin/bash")
 fi
 
 # stack 1: go back to old working directory
