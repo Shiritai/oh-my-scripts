@@ -16,7 +16,7 @@ jobs:
       
       - name: Build image
         run: |
-          OMS_MODE=b IMG_NAME=oms-core USE_SSH=yes USERNAME=meow \
+          OMS_MODE=b IMG_NAME=oms-core USE_SSH=yes CONTAINER_USER=meow \
           TZ=Asia/Tokyo LOCALE=zh_TW.UTF-8 ${{ github.workspace }}/run.sh
       
       - name: Export image
@@ -53,7 +53,7 @@ jobs:
 
     - name: Run image
       run: |
-        OMS_MODE=r IMG_NAME=oms-core USE_SSH=yes USERNAME=meow \
+        OMS_MODE=r IMG_NAME=oms-core USE_SSH=yes CONTAINER_USER=meow \
         TZ=Asia/Tokyo LOCALE=zh_TW.UTF-8 ${{ github.workspace }}/run.sh
 
     - name: Test username
