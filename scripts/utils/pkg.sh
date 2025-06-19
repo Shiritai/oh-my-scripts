@@ -14,7 +14,7 @@ install_if_dne() {
                 _UPDATED=yes
             fi
             print_info "$item DNE, install it..."
-            sudo $PKG_INSTALL $item > /dev/null
+            sudo DEBIAN_FRONTEND=noninteractive $PKG_INSTALL $item > /dev/null
             print_info "$item installed successfully"
         else
             print_info "$item exists, skip installation"
