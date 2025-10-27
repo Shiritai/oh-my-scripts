@@ -165,6 +165,13 @@ DEV_SCRIPTS_PATH=$(get_absolute_path_if_is_relative $DEV_SCRIPTS_PATH)
 # assigned by user), make it absolute.
 MOUNT_DIR=$(get_absolute_path_if_is_relative $MOUNT_DIR)
 
+if docker info >/dev/null 2>&1; then
+    DOCKER_CMD="docker"
+else
+    # 如果失敗，則假設需要 sudo
+    DOCKER_CMD="sudo docker"
+fi
+
 # ----------- [Confirmation Part] -----------
 
 if [[ $OMS_MODE = *'h'* ]]; then
@@ -204,7 +211,7 @@ if [[ $OMS_MODE = *'b'* && $OMS_MODE != *'d'* ]]; then
     cat .gitignore proto.dockerignore >> .dockerignore
 
     # build docker image
-    sudo docker build -t $IMG_NAME \
+    $DOCKER_CMD build -t $IMG_NAME \
                       --build-arg BASE_IMG="${BASE_IMG}" \
                       --build-arg LOCALE="${LOCALE}" \
                       --build-arg TZ="${TZ}" \
@@ -231,7 +238,7 @@ fi
 
 if [[ $OMS_MODE = *'r'* && $OMS_MODE != *'d'* ]]; then
     # run container
-    sudo docker run -d -it \
+    $DOCKER_CMD run -d -it \
                     $([[ $USE_MOUNT_DIR = 'yes' ]] && echo "-v $MOUNT_DIR:/home/${CONTAINER_USER}/data") \
                     $([[ $USE_GPU = 'yes' ]] && echo "--gpus all") \
                     $([[ $USE_SYSTEMD = 'yes' ]] && echo "--tmpfs /run --tmpfs /run/lock --tmpfs /tmp
